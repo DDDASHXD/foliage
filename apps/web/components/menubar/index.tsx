@@ -22,7 +22,7 @@ import { useApplicationStore } from '@/stores/application.store'
 const Menubar = () => {
   const { terminalOpen, setTerminalOpen } = useApplicationStore()
   return (
-    <MenubarRoot className="bg-secondary">
+    <MenubarRoot className="bg-secondary border-0">
       <MenubarMenu>
         <MenubarTrigger className="font-bold">Openmd</MenubarTrigger>
         <MenubarContent>

@@ -1,65 +1,208 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useCollaborationStore } from '@/stores/collaboration.store'
-import { useFilesStore } from '@/stores/files.store'
+import { useFilesStore, type OpenFile } from '@/stores/files.store'
 import { cn } from '@workspace/ui/lib/utils'
+import { OPENMD_PATH_MIME, OPENMD_SOURCE_GROUP_MIME, isTreeDirectoryDrag } from '@/lib/openmd-dnd'
+import { X } from 'lucide-react'
 
-const EditorTabs = () => {
-  const [activeTab, setActiveTab] = useState<number>(0)
-  const collaborators = useCollaborationStore((state) => state.collaborators)
-  const activeFile = useFilesStore((state) => state.activeFile)
-  const tabs = activeFile
-    ? [
-        {
-          id: 0,
-          name: activeFile.split('/').at(-1) ?? activeFile,
-        },
-      ]
-    : []
+const reorderTabIndex = (fromIndex: number, targetFinalIndex: number, length: number) => {
+  let toAfterRemove = targetFinalIndex
+  if (fromIndex < targetFinalIndex) {
+    toAfterRemove = targetFinalIndex - 1
+  }
+  if (toAfterRemove < 0) {
+    return 0
+  }
+  if (toAfterRemove > length - 1) {
+    return length - 1
+  }
+  return toAfterRemove
+}
+
+const TabRow = ({
+  groupId,
+  path,
+  name,
+  tabIndex,
+  isActive,
+  openFiles,
+}: {
+  groupId: string
+  path: string
+  name: string
+  tabIndex: number
+  isActive: boolean
+  openFiles: OpenFile[]
+}) => {
+  const closeFileInGroup = useFilesStore((state) => state.closeFileInGroup)
+  const setActiveFileInGroup = useFilesStore((state) => state.setActiveFileInGroup)
+  const reorderFilesInGroup = useFilesStore((state) => state.reorderFilesInGroup)
+  const openFileInGroup = useFilesStore((state) => state.openFileInGroup)
+  const setFileDragActive = useFilesStore((state) => state.setFileDragActive)
+
+  const handleClose = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    closeFileInGroup(groupId, path)
+  }
+
+  const handleDragStart = (event: React.DragEvent) => {
+    event.dataTransfer.setData(OPENMD_PATH_MIME, path)
+    event.dataTransfer.setData(OPENMD_SOURCE_GROUP_MIME, groupId)
+    event.dataTransfer.effectAllowed = 'move'
+    setFileDragActive(true)
+    useFilesStore.getState().setTreeDragSource(path, false)
+  }
+
+  const handleDragEnd = () => {
+    setFileDragActive(false)
+  }
+
+  const handleDragOver = (event: React.DragEvent) => {
+    if (![...event.dataTransfer.types].includes(OPENMD_PATH_MIME)) {
+      return
+    }
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const dragPath = event.dataTransfer.getData(OPENMD_PATH_MIME)
+    if (!dragPath) {
+      return
+    }
+
+    const fromIndex = openFiles.findIndex((f) => f.path === dragPath)
+    if (fromIndex === -1) {
+      if (isTreeDirectoryDrag(event.dataTransfer)) {
+        return
+      }
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+      const before = event.clientX < rect.left + rect.width / 2
+      const insertAt = before ? tabIndex : tabIndex + 1
+      openFileInGroup(groupId, dragPath, insertAt)
+      return
+    }
+
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    const before = event.clientX < rect.left + rect.width / 2
+    const targetFinalIndex = before ? tabIndex : tabIndex + 1
+    const toIndex = reorderTabIndex(fromIndex, targetFinalIndex, openFiles.length)
+    reorderFilesInGroup(groupId, fromIndex, toIndex)
+  }
 
   return (
-    <div className="flex flex-col border-b">
-      <div className="bg-muted flex">
-        {tabs.map((tab) => (
-          <div
-            key={tab.id}
-            className={cn(
-              'px-4 py-2 cursor-default border-r border-b',
-              activeTab === tab.id && 'bg-background text-foreground border-b-0',
-            )}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.name}
-          </div>
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className={cn(
+        'px-4 py-2 cursor-default border-r border-b flex items-center gap-2 select-none shrink-0',
+        isActive && 'bg-background text-foreground border-b-0',
+      )}
+      onClick={() => setActiveFileInGroup(groupId, path)}
+    >
+      <span className="text-sm whitespace-nowrap">{name}</span>
+      <button
+        type="button"
+        onClick={handleClose}
+        className="hover:bg-muted-foreground/20 rounded p-0.5 transition-colors w-max whitespace-nowrap"
+      >
+        <X size={14} />
+      </button>
+    </div>
+  )
+}
+
+const EditorTabs = ({ groupId }: { groupId: string }) => {
+  const collaborators = useCollaborationStore((state) => state.collaborators)
+  const group = useFilesStore((state) => state.groups[groupId])
+  const reorderFilesInGroup = useFilesStore((state) => state.reorderFilesInGroup)
+  const openFileInGroup = useFilesStore((state) => state.openFileInGroup)
+  const setFileDragActive = useFilesStore((state) => state.setFileDragActive)
+
+  const openFiles = group?.openFiles ?? []
+  const activeFile = group?.activeFile ?? null
+
+  const handleStripDragOver = (event: React.DragEvent) => {
+    if ([...event.dataTransfer.types].includes(OPENMD_PATH_MIME)) {
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+    }
+  }
+
+  const handleStripDrop = (event: React.DragEvent) => {
+    event.preventDefault()
+    const dragPath = event.dataTransfer.getData(OPENMD_PATH_MIME)
+    if (!dragPath) {
+      return
+    }
+
+    const fromIndex = openFiles.findIndex((f) => f.path === dragPath)
+    if (fromIndex === -1) {
+      if (!isTreeDirectoryDrag(event.dataTransfer)) {
+        openFileInGroup(groupId, dragPath)
+      }
+      return
+    }
+
+    const targetFinalIndex = openFiles.length
+    const toIndex = reorderTabIndex(fromIndex, targetFinalIndex, openFiles.length)
+    reorderFilesInGroup(groupId, fromIndex, toIndex)
+  }
+
+  const handleStripDragStartCleanup = () => {
+    setFileDragActive(false)
+  }
+
+  return (
+    <div className="flex min-w-0 flex-col border-t">
+      <div className="bg-muted flex min-w-0 items-stretch overflow-x-auto">
+        {openFiles.map((file, index) => (
+          <TabRow
+            key={file.path}
+            groupId={groupId}
+            path={file.path}
+            name={file.name}
+            tabIndex={index}
+            isActive={activeFile === file.path}
+            openFiles={openFiles}
+          />
         ))}
-        <div className="empty w-full h-full border-b"></div>
+        <div
+          role="presentation"
+          className="min-w-8 flex-1 border-b"
+          onDragOver={handleStripDragOver}
+          onDrop={handleStripDrop}
+          onDragEnd={handleStripDragStartCleanup}
+        />
       </div>
-      {tabs
-        .filter((tab) => tab.id !== activeTab)
-        .map((tab) => (
-          <div key={tab.id} className="px-4 py-2 pl-6 flex gap-2 items-center">
-            <div className="avatars flex">
-              {collaborators.slice(0, 3).map((collaborator) => (
+      {openFiles.length > 0 && (
+        <div className="px-4 py-2 pl-6 flex gap-2 items-center border-b">
+          <div className="avatars flex">
+            {collaborators.slice(0, 3).map((collaborator) => (
+              <div
+                key={collaborator.id}
+                className="size-6 bg-background rounded-full -ml-2 relative isolate p-[3px]"
+                title={collaborator.name}
+              >
                 <div
-                  key={collaborator.id}
-                  className="size-9 bg-background rounded-full -ml-4 relative isolate p-1"
-                  title={collaborator.name}
-                >
-                  <div
-                    className="w-full h-full rounded-full border"
-                    style={{ backgroundColor: collaborator.color }}
-                  ></div>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs">
-              {collaborators.length === 1
-                ? '1 person here'
-                : `${collaborators.length} people here`}
-            </p>
+                  className="w-full h-full rounded-full border"
+                  style={{ backgroundColor: collaborator.color }}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+          <p className="text-xs">
+            {collaborators.length === 1 ? '1 person here' : `${collaborators.length} people here`}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

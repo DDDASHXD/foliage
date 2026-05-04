@@ -31,7 +31,8 @@ export default function RootLayout({
         fontSans.variable,
         'font-mono',
         geistMono.variable,
-        terminalFont.variable
+        terminalFont.variable,
+        'bg-secondary',
       )}
     >
       <body>

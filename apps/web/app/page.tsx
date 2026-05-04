@@ -1,8 +1,7 @@
 'use client'
 
 import Sidebar from '@/components/sidebar/sidebar'
-import { MonacoEditor } from '@/components/editor/monaco-editor'
-import EditorTabs from '@/components/editor/tabs'
+import { EditorLayoutRoot } from '@/components/editor/editor-layout-root'
 import Menubar from '@/components/menubar'
 import Terminal from '@/components/terminal'
 import { useApplicationStore } from '@/stores/application.store'
@@ -13,12 +12,11 @@ export default function Page() {
   return (
     <div className="w-screen h-screen flex flex-col">
       <Menubar />
-      <div className="flex h-full min-h-0">
+      <div className="flex min-h-0 min-w-0 flex-1">
         <Sidebar />
         {/* content */}
-        <div className="flex min-h-0 flex-1 flex-col gap-1">
-          <EditorTabs />
-          <MonacoEditor />
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-1">
+          <EditorLayoutRoot />
           {terminalOpen && <Terminal />}
         </div>
       </div>

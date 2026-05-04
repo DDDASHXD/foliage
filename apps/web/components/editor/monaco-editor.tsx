@@ -10,6 +10,7 @@ import type { OnMount } from '@monaco-editor/react'
 import type { editor as MonacoEditorNamespace } from 'monaco-editor'
 
 export type MonacoEditorProps = {
+  groupId: string
   defaultValue?: string
   defaultLanguage?: string
 }
@@ -53,6 +54,7 @@ const getCollaborationUrl = () => {
 const getCssString = (value: string) => JSON.stringify(value)
 
 export const MonacoEditor = ({
+  groupId,
   defaultValue = '',
   defaultLanguage = 'markdown',
 }: MonacoEditorProps) => {
@@ -61,7 +63,7 @@ export const MonacoEditor = ({
     React.useState<MonacoEditorNamespace.IStandaloneCodeEditor | null>(null)
   const [name, setName] = React.useState<string | null | undefined>(undefined)
   const [draftName, setDraftName] = React.useState('')
-  const activeFile = useFilesStore((state) => state.activeFile)
+  const activeFile = useFilesStore((state) => state.groups[groupId]?.activeFile ?? null)
   const { setCollaborators, setConnectionStatus } = useCollaborationStore()
 
   React.useEffect(() => {
@@ -138,6 +140,19 @@ export const MonacoEditor = ({
         new Set([editor]),
         provider.awareness
       )
+
+      // Monaco disposes the model before this effect cleans up (e.g. all tabs closed).
+      // y-monaco then calls binding.destroy() from onWillDispose; a second destroy throws
+      // on awareness.off inside Yjs.
+      let bindingDestroyed = false
+      const runBindingDestroy = binding.destroy.bind(binding)
+      binding.destroy = () => {
+        if (bindingDestroyed) {
+          return
+        }
+        bindingDestroyed = true
+        runBindingDestroy()
+      }
 
       const updatePresence = () => {
         const collaboratorsByClient = Array.from(
@@ -233,7 +248,7 @@ export const MonacoEditor = ({
       disposed = true
       cleanup()
     }
-  }, [activeFile, editor, name, setCollaborators, setConnectionStatus])
+  }, [activeFile, editor, name, setCollaborators, setConnectionStatus, groupId])
 
   const handleMount = React.useCallback<OnMount>((mountedEditor) => {
     setEditor(mountedEditor)
@@ -261,27 +276,25 @@ export const MonacoEditor = ({
     )
   }
 
+  if (!activeFile) {
+    return null
+  }
+
   return (
     <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col">
-      {activeFile ? (
-        <Editor
-          path={activeFile}
-          height="100%"
-          defaultLanguage={defaultLanguage}
-          defaultValue={defaultValue}
-          onMount={handleMount}
-          options={{
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            fontSize: 14,
-            automaticLayout: true,
-          }}
-        />
-      ) : (
-        <div className="bg-background text-muted-foreground flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm">
-          Select a file
-        </div>
-      )}
+      <Editor
+        path={activeFile}
+        height="100%"
+        defaultLanguage={defaultLanguage}
+        defaultValue={defaultValue}
+        onMount={handleMount}
+        options={{
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          fontSize: 14,
+          automaticLayout: true,
+        }}
+      />
       {name === null && (
         <div className="bg-background/70 absolute inset-0 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
           <form
