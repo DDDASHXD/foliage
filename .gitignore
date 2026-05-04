@@ -1,0 +1,6 @@
+.turbo/
+.next/
+node_modules/
+.env
+.env.local
+.pnpm-lock.yaml
