@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "pnpm run dev:server",
     "devUrl": "http://127.0.0.1:3000/launcher",
-    "beforeBuildCommand": "pnpm --filter web build",
+    "beforeBuildCommand": "pnpm --filter web build:tauri",
     "frontendDist": "../../web/out"
   },
   "app": {

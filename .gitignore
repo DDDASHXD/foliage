@@ -33,5 +33,8 @@ Thumbs.db
 # Logs
 *.log
 
+# Tauri / Next desktop build stash
+apps/web/.tauri-api-stash/
+
 # Local test workspace
 test-workspace/

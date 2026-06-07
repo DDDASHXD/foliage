@@ -38,9 +38,23 @@ On first launch the app:
 ## Build
 
 ```bash
-pnpm --filter web build
-pnpm --filter desktop build
+pnpm desktop:build
 ```
+
+This runs a static Next.js export (`apps/web/out`) and bundles the Tauri app.
+
+## Releases
+
+GitHub Releases are built automatically when you push a version tag:
+
+```bash
+git tag v0.0.1
+git push origin v0.0.1
+```
+
+The `Release Desktop` workflow (`.github/workflows/release-desktop.yml` at the repo root) builds macOS (arm64 + x64), Windows, and Linux installers and uploads them to the GitHub release for that tag.
+
+Bump `version` in `apps/desktop/src-tauri/tauri.conf.json` (and `Cargo.toml` if needed) before tagging so the release matches the app version.
 
 ## Tauri commands
 

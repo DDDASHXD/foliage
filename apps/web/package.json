@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node server.mjs --workspace /Users/skov/Documents/GitHub/openmd/test-workspace",
     "build": "next build",
+    "build:tauri": "node scripts/build-tauri.mjs",
     "start": "NODE_ENV=production node server.mjs",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
