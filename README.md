@@ -2,9 +2,7 @@
 
 ![Banner](./banner.png)
 
-Foliage is a local-first writing workspace for markdown projects. It gives you a file tree, a multi-pane Monaco editor, PDF and image viewing, collaboration over WebSockets, and export tools powered by Leafmark.
-
-The project used to be called OpenMD. The app, packages, CLI commands, and documentation now use the Foliage name.
+Foliage is a local-first writing workspace for markdown projects. It gives you a file tree, a multi-pane Monaco editor, PDF and image viewing, collaboration over WebSockets, and export tools powered by [Leafmark](https://github.com/DDDASHXD/leafmark).
 
 ## What Foliage Is
 
@@ -16,59 +14,13 @@ It is not a hosted editor. Your files live on disk in a normal folder. Foliage s
 
 - Open or create a folder-based writing project
 - Browse, create, rename, move, and delete files and folders
-- Edit text and markdown in Monaco
+- Edit text and markdown
 - Split editor panes by dragging tabs to pane edges
 - Preview PDFs and images alongside source files
 - Collaborate with other clients through Yjs and WebSockets
-- Build Leafmark projects to PDF, DOCX, and HTML
+- Build Leafmark projects to PDF, DOCX, and HTML (more to come)
 - Share a local workspace through a relay when live share is enabled
 - Run as a desktop app, a CLI-launched web app, or a headless server
-
-## Leafmark
-
-Leafmark is the publishing engine inside Foliage. Foliage is the workspace where you write and organize files; Leafmark is the system that turns an ordered markdown project into finished outputs.
-
-In Foliage, Leafmark handles:
-
-- Project initialization
-- Frontmatter and project metadata
-- Chapter ordering
-- Build status, word counts, and character counts
-- Themes
-- PDF and DOCX output
-- Optional HTML output
-- Watch mode for rebuilding as files change
-
-A new Foliage project is scaffolded like this:
-
-```text
-my-project/
-  project/
-    _frontmatter.md
-    chapter-1.md
-  other/
-  .foliage/
-    settings.json
-```
-
-By default, `.foliage/settings.json` points Leafmark at the `project` folder and builds into `dist`.
-
-```json
-{
-  "leafmark": {
-    "projectFolder": "project",
-    "buildOptions": {
-      "output": "dist",
-      "outputFormat": "pdf",
-      "html": false,
-      "htmlOnly": false,
-      "noMergeCover": false
-    }
-  }
-}
-```
-
-Inside the app, open **Export** to choose a Leafmark project folder, initialize it if needed, reorder chapters, edit metadata/config, apply a theme, build once, or start watch mode.
 
 ## Install
 
@@ -107,7 +59,7 @@ pnpx foliage --workspace /path/to/project
 
 The CLI starts the Foliage server and UI locally. By default it serves the launcher on port 3000.
 
-## Tutorial: Create A Project
+## Creating A Project
 
 1. Start the desktop app or run `pnpx foliage`.
 2. Choose **Create project** in the launcher.
@@ -119,7 +71,7 @@ The CLI starts the Foliage server and UI locally. By default it serves the launc
 
 The generated project is just a folder on disk. You can edit it from Foliage, your terminal, Git, or any other editor.
 
-## Tutorial: Use An Existing Markdown Folder
+## Using An Existing Markdown Folder
 
 1. Start Foliage.
 2. Choose **Open folder**.
@@ -132,7 +84,7 @@ The generated project is just a folder on disk. You can edit it from Foliage, yo
 
 Foliage keeps workspace settings in `.foliage/settings.json`. Leafmark-specific project files stay with the selected Leafmark project folder.
 
-## Tutorial: Build From Source
+## Build From Source
 
 Prerequisites:
 
@@ -175,7 +127,7 @@ pnpm desktop:build
 
 Desktop build output is written under `apps/desktop/src-tauri/target/release/bundle/`.
 
-## Tutorial: Run A Headless Workspace Server
+## Running A Headless Workspace Server
 
 Foliage can run without serving the full UI. This is useful for a LAN or VPS workspace that desktop or web clients connect to.
 
@@ -197,7 +149,7 @@ Then use **Connect to server** in the launcher and enter the server URL.
 
 ## Live Share
 
-Live share tunnels a local Foliage workspace through a relay so another client can connect without direct port forwarding.
+Live share tunnels a local Foliage workspace through a relay, so another client can connect without direct port forwarding.
 
 The default relay URL is:
 
