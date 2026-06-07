@@ -23,7 +23,7 @@ type AwarenessState = {
   }
 }
 
-const nameStorageKey = 'openmd-collaboration-name'
+const nameStorageKey = 'foliage-collaboration-name'
 const yTextName = 'monaco'
 const colorPalette = [
   '#2563eb',

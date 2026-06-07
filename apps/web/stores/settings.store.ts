@@ -23,6 +23,8 @@ export type WorkspaceSettings = {
   leafmark?: {
     projectFolder: string
     buildOptions: {
+      output?: string
+      outputFormat?: 'pdf' | 'docx'
       html?: boolean
       htmlOnly?: boolean
       noMergeCover?: boolean
@@ -47,12 +49,14 @@ const defaultSettings: WorkspaceSettings = {
   workspace: {
     maxDirectoryEntries: 500,
     maxUploadBytes: 104857600,
-    ignoredDirectories: ['.git', '.next', '.turbo', '.openmd'],
+    ignoredDirectories: ['.git', '.next', '.turbo', '.foliage'],
     showHiddenFiles: false,
   },
   leafmark: {
     projectFolder: 'project',
     buildOptions: {
+      output: 'dist',
+      outputFormat: 'pdf',
       html: false,
       htmlOnly: false,
       noMergeCover: false,

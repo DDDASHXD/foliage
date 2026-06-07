@@ -39,7 +39,7 @@ export const startLiveShare = async (): Promise<string> => {
     }
 
     console.info(
-      `Live share session ${data.sessionId} created. Run: openmd-relay-client --relay-url ${relayUrl} --session-id ${data.sessionId} --local-port ${window.location.port || '3000'}`,
+      `Live share session ${data.sessionId} created. Run: foliage-relay-client --relay-url ${relayUrl} --session-id ${data.sessionId} --local-port ${window.location.port || '3000'}`,
     )
   }
 

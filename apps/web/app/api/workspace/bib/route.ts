@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 function getWorkspaceRoot() {
-  return process.env.OPENMD_WORKSPACE ? path.resolve(process.env.OPENMD_WORKSPACE) : process.cwd()
+  return process.env.FOLIAGE_WORKSPACE ? path.resolve(process.env.FOLIAGE_WORKSPACE) : process.cwd()
 }
 
 function resolveWorkspacePath(relativePath: string) {

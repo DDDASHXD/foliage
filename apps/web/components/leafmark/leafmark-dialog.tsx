@@ -18,12 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@workspace/ui/components/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@workspace/ui/components/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
 import { Button } from '@workspace/ui/components/button'
 import { Input } from '@workspace/ui/components/input'
@@ -190,7 +185,7 @@ export const LeafmarkDialog = () => {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogContent className="flex max-h-[85vh] max-w-3xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="border-b px-6 py-4">
-          <DialogTitle>Leafmark</DialogTitle>
+          <DialogTitle>Export</DialogTitle>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-auto px-6 py-4">
@@ -293,6 +288,39 @@ export const LeafmarkDialog = () => {
 
             <TabsContent value="build" className="mt-4 space-y-4">
               <div className="grid gap-3">
+                <div className="grid gap-2">
+                  <Label htmlFor="leafmark-output">Output directory</Label>
+                  <Input
+                    id="leafmark-output"
+                    value={buildOptions.output ?? ''}
+                    onChange={(event) => setBuildOptions({ output: event.target.value })}
+                    placeholder="dist"
+                    disabled={isBusy}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    Relative to workspace root. Built files go to{' '}
+                    {(buildOptions.output?.trim() || 'dist').replace(/\/+$/, '')}/output.
+                    {buildOptions.outputFormat === 'docx' ? 'docx' : 'pdf'}
+                  </p>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="leafmark-output-format">Output format</Label>
+                  <NativeSelect
+                    id="leafmark-output-format"
+                    value={buildOptions.outputFormat ?? 'pdf'}
+                    onChange={(event) =>
+                      setBuildOptions({
+                        outputFormat: event.target.value === 'docx' ? 'docx' : 'pdf',
+                      })
+                    }
+                    disabled={isBusy}
+                  >
+                    <NativeSelectOption value="pdf">PDF</NativeSelectOption>
+                    <NativeSelectOption value="docx">DOCX</NativeSelectOption>
+                  </NativeSelect>
+                </div>
+
                 <div className="flex items-center justify-between gap-4">
                   <Label htmlFor="leafmark-html">Also build HTML</Label>
                   <Switch
@@ -311,7 +339,10 @@ export const LeafmarkDialog = () => {
                     checked={Boolean(buildOptions.htmlOnly)}
                     disabled={isBusy}
                     onCheckedChange={(checked) =>
-                      setBuildOptions({ htmlOnly: checked, html: checked ? true : buildOptions.html })
+                      setBuildOptions({
+                        htmlOnly: checked,
+                        html: checked ? true : buildOptions.html,
+                      })
                     }
                   />
                 </div>
@@ -320,7 +351,7 @@ export const LeafmarkDialog = () => {
                   <Switch
                     id="leafmark-no-cover"
                     checked={Boolean(buildOptions.noMergeCover)}
-                    disabled={isBusy}
+                    disabled={isBusy || buildOptions.outputFormat === 'docx'}
                     onCheckedChange={(checked) => setBuildOptions({ noMergeCover: checked })}
                   />
                 </div>
@@ -347,31 +378,6 @@ export const LeafmarkDialog = () => {
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" disabled={isBusy} onClick={() => void runBuild()}>
-                  {busyAction === 'build' ? (
-                    <>
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                      Building…
-                    </>
-                  ) : (
-                    'Build'
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isBusy || !project?.isLeafmarkProject}
-                  onClick={() => void toggleWatch()}
-                >
-                  {busyAction === 'watch'
-                    ? 'Updating watch…'
-                    : project?.watching
-                      ? 'Stop watch'
-                      : 'Start watch'}
-                </Button>
-              </div>
-
               {lastLog && <p className="text-muted-foreground text-sm">{lastLog}</p>}
 
               {lastBuild && (
@@ -384,6 +390,16 @@ export const LeafmarkDialog = () => {
                       onClick={() => openFile(lastBuild.outputs.pdf!)}
                     >
                       Open PDF
+                    </Button>
+                  )}
+                  {lastBuild.outputs.docx && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openFile(lastBuild.outputs.docx!)}
+                    >
+                      Open DOCX
                     </Button>
                   )}
                   {lastBuild.outputs.html && (
@@ -410,7 +426,9 @@ export const LeafmarkDialog = () => {
                     <div className="min-w-0">
                       <p className="text-sm font-medium">{theme.name}</p>
                       {theme.description && (
-                        <p className="text-muted-foreground truncate text-xs">{theme.description}</p>
+                        <p className="text-muted-foreground truncate text-xs">
+                          {theme.description}
+                        </p>
                       )}
                     </div>
                     <Button
@@ -486,9 +504,7 @@ export const LeafmarkDialog = () => {
                   <Label htmlFor="leafmark-bibliography">Bibliography</Label>
                   <Input
                     id="leafmark-bibliography"
-                    value={
-                      typeof metadata.bibliography === 'string' ? metadata.bibliography : ''
-                    }
+                    value={typeof metadata.bibliography === 'string' ? metadata.bibliography : ''}
                     onChange={(event) => updateMetadataField('bibliography', event.target.value)}
                     disabled={isBusy}
                   />
@@ -511,6 +527,31 @@ export const LeafmarkDialog = () => {
               </Button>
             </TabsContent>
           </Tabs>
+        </div>
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2 border-t px-6 py-4">
+          <Button type="button" disabled={isBusy} onClick={() => void runBuild()}>
+            {busyAction === 'build' ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              'Export'
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isBusy || !project?.isLeafmarkProject}
+            onClick={() => void toggleWatch()}
+          >
+            {busyAction === 'watch'
+              ? 'Updating watch…'
+              : project?.watching
+                ? 'Stop watch'
+                : 'Start watch'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

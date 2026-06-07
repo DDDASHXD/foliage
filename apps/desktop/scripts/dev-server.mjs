@@ -4,14 +4,14 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { startServer } from '@openmd/server'
+import { startServer } from '@foliage/server'
 
 const DEV_PORT = 3000
 const DEV_HOST = '127.0.0.1'
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDirectory, '../../..')
 const appDirectory = path.join(repoRoot, 'apps/web')
-const shellWorkspace = path.join(os.homedir(), '.openmd', 'shell')
+const shellWorkspace = path.join(os.homedir(), '.foliage', 'shell')
 const lockPath = path.join(appDirectory, '.next/dev/lock')
 
 const isHealthy = async () => {
@@ -51,7 +51,7 @@ const removeStaleLock = async () => {
 await fs.mkdir(shellWorkspace, { recursive: true })
 
 if (await isHealthy()) {
-  console.log(`Reusing openmd dev server at http://${DEV_HOST}:${DEV_PORT}/launcher`)
+  console.log(`Reusing foliage dev server at http://${DEV_HOST}:${DEV_PORT}/launcher`)
   // Keep this process alive while Tauri dev runs.
   await new Promise(() => {})
 }
@@ -59,7 +59,7 @@ if (await isHealthy()) {
 killPort(DEV_PORT)
 await removeStaleLock()
 
-console.log(`Starting openmd dev server on http://${DEV_HOST}:${DEV_PORT}/launcher`)
+console.log(`Starting foliage dev server on http://${DEV_HOST}:${DEV_PORT}/launcher`)
 console.log(`Shell workspace: ${shellWorkspace}`)
 
 await startServer({

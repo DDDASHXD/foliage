@@ -4,18 +4,18 @@ use tauri::{AppHandle, Emitter, Manager};
 const MENU_OPEN_PROJECT: &str = "open_project";
 const MENU_CLOSE_PROJECT: &str = "close_project";
 const MENU_LEAFMARK: &str = "leafmark";
-const MENU_EXPORT: &str = "export";
 const MENU_LIVE_SHARE: &str = "live_share";
 const MENU_ABOUT: &str = "about";
 const MENU_REPORT_BUG: &str = "report_bug";
 
 pub fn setup_menu(app: &AppHandle) -> tauri::Result<()> {
-    let app_menu = SubmenuBuilder::new(app, "openmd")
+    let app_menu = SubmenuBuilder::new(app, "foliage")
         .about(Some(AboutMetadata {
-            name: Some("openmd".into()),
+            icon: Some(tauri::include_image!("icons/128x128.png")),
+            name: Some("foliage".into()),
             ..Default::default()
         }))
-        .text(MENU_ABOUT, "About Openmd")
+        .text(MENU_ABOUT, "About Foliage")
         .separator()
         .services()
         .separator()
@@ -31,8 +31,7 @@ pub fn setup_menu(app: &AppHandle) -> tauri::Result<()> {
         .separator()
         .text(MENU_CLOSE_PROJECT, "Close Project")
         .separator()
-        .text(MENU_LEAFMARK, "Leafmark…")
-        .text(MENU_EXPORT, "Export")
+        .text(MENU_LEAFMARK, "Export…")
         .separator()
         .text(MENU_LIVE_SHARE, "Start Live Share…")
         .build()?;

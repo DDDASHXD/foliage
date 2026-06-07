@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "openmd",
+  "productName": "foliage",
   "version": "0.0.3",
-  "identifier": "dev.skxv.openmd",
+  "identifier": "dev.skxv.foliage",
   "build": {
     "beforeDevCommand": "pnpm run dev:server",
     "devUrl": "http://127.0.0.1:3000/launcher",
@@ -13,11 +13,12 @@
     "windows": [
       {
         "label": "main",
-        "title": "openmd",
+        "title": "foliage",
         "url": "/launcher.html",
         "width": 900,
         "height": 600,
         "resizable": true,
+        "dragDropEnabled": false,
         "center": true
       }
     ],
@@ -30,12 +31,12 @@
     "targets": "all",
     "resources": [
       "resources/node/**/*",
-      "resources/openmd-relay/**/*",
-      "resources/openmd-server/bin/**/*",
-      "resources/openmd-server/lib/**/*",
-      "resources/openmd-server/src/**/*",
-      "resources/openmd-server/package.json",
-      "resources/openmd-server/node_modules/**/*"
+      "resources/foliage-relay/**/*",
+      "resources/foliage-server/bin/**/*",
+      "resources/foliage-server/lib/**/*",
+      "resources/foliage-server/src/**/*",
+      "resources/foliage-server/package.json",
+      "resources/foliage-server/node_modules/**/*"
     ],
     "macOS": {
       "signingIdentity": "-"

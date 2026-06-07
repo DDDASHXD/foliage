@@ -1,241 +1,276 @@
-# openmd
+# Foliage
 
-A local-first markdown workspace with an Obsidian-style launcher, multi-pane Monaco editor, and real-time collaboration. Run it as a desktop app, from the terminal, or as a headless server that remote clients connect to.
+![Banner](./banner.png)
 
-## Features
+Foliage is a local-first writing workspace for markdown projects. It gives you a file tree, a multi-pane Monaco editor, PDF and image viewing, collaboration over WebSockets, and export tools powered by Leafmark.
 
-- **Project launcher** — create a new project, open a folder, pick from recents, or connect to a remote server
-- **File tree** — browse, create, rename, move, and delete files and folders in your workspace
-- **Multi-pane editor** — split editors by dragging tabs to pane edges; Monaco for text, viewers for PDF and images
-- **Collaboration** — Yjs + WebSockets for shared editing when multiple people are in the same workspace
-- **Live share** — tunnel a local workspace through a relay so guests can connect without port forwarding
-- **Export & Leafmark** — export markdown and run Leafmark from the menubar
-- **Native desktop shell** — Tauri app with macOS menubar, folder pickers, and an embedded API server
+The project used to be called OpenMD. The app, packages, CLI commands, and documentation now use the Foliage name.
+
+## What Foliage Is
+
+Foliage is built for long-form markdown work that still needs a real project workspace around it: notes, books, reports, papers, documentation, and mixed markdown/code folders.
+
+It is not a hosted editor. Your files live on disk in a normal folder. Foliage starts a local server for that folder, exposes a browser or desktop UI, and writes changes back to the filesystem. That local server also handles collaboration, workspace file operations, and Leafmark builds.
+
+## What You Can Do
+
+- Open or create a folder-based writing project
+- Browse, create, rename, move, and delete files and folders
+- Edit text and markdown in Monaco
+- Split editor panes by dragging tabs to pane edges
+- Preview PDFs and images alongside source files
+- Collaborate with other clients through Yjs and WebSockets
+- Build Leafmark projects to PDF, DOCX, and HTML
+- Share a local workspace through a relay when live share is enabled
+- Run as a desktop app, a CLI-launched web app, or a headless server
+
+## Leafmark
+
+Leafmark is the publishing engine inside Foliage. Foliage is the workspace where you write and organize files; Leafmark is the system that turns an ordered markdown project into finished outputs.
+
+In Foliage, Leafmark handles:
+
+- Project initialization
+- Frontmatter and project metadata
+- Chapter ordering
+- Build status, word counts, and character counts
+- Themes
+- PDF and DOCX output
+- Optional HTML output
+- Watch mode for rebuilding as files change
+
+A new Foliage project is scaffolded like this:
+
+```text
+my-project/
+  project/
+    _frontmatter.md
+    chapter-1.md
+  other/
+  .foliage/
+    settings.json
+```
+
+By default, `.foliage/settings.json` points Leafmark at the `project` folder and builds into `dist`.
+
+```json
+{
+  "leafmark": {
+    "projectFolder": "project",
+    "buildOptions": {
+      "output": "dist",
+      "outputFormat": "pdf",
+      "html": false,
+      "htmlOnly": false,
+      "noMergeCover": false
+    }
+  }
+}
+```
+
+Inside the app, open **Export** to choose a Leafmark project folder, initialize it if needed, reorder chapters, edit metadata/config, apply a theme, build once, or start watch mode.
 
 ## Install
 
-### Desktop app (recommended)
+### Desktop App
 
-Download the installer for your platform from [GitHub Releases](https://github.com/DDDASHXD/openmd/releases).
+Download a desktop build from [GitHub Releases](https://github.com/DDDASHXD/foliage/releases).
 
-| Platform | Asset |
-|----------|-------|
-| macOS (Apple Silicon) | `openmd_*_aarch64.dmg` |
-| macOS (Intel) | `openmd_*_x64.dmg` |
-| Windows | `openmd_*_x64-setup.exe` |
-| Linux | `.deb` or `.AppImage` |
+| Platform            | Asset                     |
+| ------------------- | ------------------------- |
+| macOS Apple Silicon | `foliage_*_aarch64.dmg`   |
+| macOS Intel         | `foliage_*_x64.dmg`       |
+| Windows             | `foliage_*_x64-setup.exe` |
+| Linux               | `.deb` or `.AppImage`     |
 
-**macOS note:** Release builds are ad-hoc signed, not notarized. If macOS says the app is damaged:
+On macOS, current release builds are ad-hoc signed rather than notarized. If macOS blocks the app after installation, remove the quarantine attribute:
 
 ```bash
-xattr -cr /Applications/openmd.app
+xattr -cr /Applications/foliage.app
 ```
 
-Or right-click **openmd.app** → **Open** → **Open** again.
+You can also right-click `foliage.app`, choose **Open**, then confirm.
 
-### CLI (no install)
+### CLI
 
-Run the full UI + server from npm without cloning the repo:
+Run Foliage without cloning the repo:
 
 ```bash
-pnpx openmd
+pnpx foliage
 ```
 
 Open a specific workspace:
 
 ```bash
-pnpx openmd --workspace /path/to/project
+pnpx foliage --workspace /path/to/project
 ```
 
-The server starts on port 3000 by default and opens the launcher at `http://127.0.0.1:3000/launcher`.
+The CLI starts the Foliage server and UI locally. By default it serves the launcher on port 3000.
 
-## Development
+## Tutorial: Create A Project
 
-### Prerequisites
+1. Start the desktop app or run `pnpx foliage`.
+2. Choose **Create project** in the launcher.
+3. Pick a parent folder and project name.
+4. Open the generated `project/chapter-1.md`.
+5. Write markdown as normal.
+6. Open **Export**.
+7. Build the project with the default PDF settings.
 
-- **Node.js** >= 20
-- **pnpm** 9 (see `packageManager` in root `package.json`)
-- **Rust** >= 1.88 via [rustup](https://rustup.rs/) (for desktop builds only)
+The generated project is just a folder on disk. You can edit it from Foliage, your terminal, Git, or any other editor.
 
-### Setup
+## Tutorial: Use An Existing Markdown Folder
+
+1. Start Foliage.
+2. Choose **Open folder**.
+3. Select the folder containing your markdown files.
+4. Open **Export**.
+5. Select the folder that should become the Leafmark project.
+6. Click **Initialize project** if the folder does not already contain Leafmark config.
+7. Arrange chapters in the **Chapters** tab.
+8. Build to PDF, DOCX, or HTML.
+
+Foliage keeps workspace settings in `.foliage/settings.json`. Leafmark-specific project files stay with the selected Leafmark project folder.
+
+## Tutorial: Build From Source
+
+Prerequisites:
+
+- Node.js 20 or newer
+- pnpm 9.15.9 or compatible through Corepack
+- Rust 1.88 or newer through rustup, only for desktop builds
+
+Clone and install:
 
 ```bash
-git clone https://github.com/DDDASHXD/openmd.git
-cd openmd
+git clone https://github.com/DDDASHXD/foliage.git
+cd foliage
 pnpm install
 ```
 
-### Web app + server
-
-From `apps/web`, dev mode runs `openmd-server` with the Next.js UI:
-
-```bash
-pnpm --filter web dev
-```
-
-Or from the repo root:
+Run the web app and local server:
 
 ```bash
 pnpm dev
 ```
 
-Adjust the default workspace path in `apps/web/package.json` (`dev` script) or pass `--workspace` consistently when starting the server.
-
-### Desktop app
-
-One-time Rust setup:
+Run the desktop app in development:
 
 ```bash
 pnpm --filter desktop setup:rust
-```
-
-Start Tauri dev (spawns the server on port 3000, then opens the desktop window):
-
-```bash
 pnpm desktop:dev
 ```
 
-If a previous dev server left a stale lock:
+Build everything:
 
 ```bash
-pnpm --filter desktop dev:stop
-pnpm desktop:dev
+pnpm build
 ```
 
-Build a production desktop bundle locally:
+Build the desktop app:
 
 ```bash
 pnpm desktop:build
 ```
 
-Output lands under `apps/desktop/src-tauri/target/release/bundle/`.
+Desktop build output is written under `apps/desktop/src-tauri/target/release/bundle/`.
 
-### Headless server
+## Tutorial: Run A Headless Workspace Server
 
-Run API + collaboration WebSockets without the Next.js UI. Useful for VPS or LAN deployments where clients use **Connect to server** in the launcher.
-
-```bash
-pnpm server:headless
-```
-
-Default: workspace `./test-workspace`, port `8787`, bind `0.0.0.0`.
-
-Direct invocation:
+Foliage can run without serving the full UI. This is useful for a LAN or VPS workspace that desktop or web clients connect to.
 
 ```bash
-openmd-server \
+foliage-server \
   --headless \
   --workspace /path/to/project \
   --port 8787 \
   --hostname 0.0.0.0
 ```
 
-Health check:
+Check that it is running:
 
 ```bash
 curl http://127.0.0.1:8787/api/health
 ```
 
-### Live share relay
+Then use **Connect to server** in the launcher and enter the server URL.
 
-The relay lets a host share a local workspace through a public URL. Default hosted relay: `https://openmd.skxv.dev`.
+## Live Share
 
-Run your own:
+Live share tunnels a local Foliage workspace through a relay so another client can connect without direct port forwarding.
+
+The default relay URL is:
+
+```text
+https://foliage.skxv.dev
+```
+
+You can also self-host the relay:
 
 ```bash
-pnpm --filter @openmd/relay dev
+pnpm --filter @foliage/relay dev
 ```
 
-Or:
+or:
 
 ```bash
-openmd-relay --port 8788 --public-base https://relay.example.com
+foliage-relay --port 8788 --public-base https://relay.example.com
 ```
 
-In the desktop app, use **File → Start live share**. The Tauri shell starts `openmd-relay-client` automatically to tunnel your local server to the relay.
+See `packages/foliage-relay/README.md` for relay details.
 
-See `packages/openmd-relay/README.md` for API details and self-hosting.
+## How It Fits Together
 
-## How it fits together
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  Desktop (Tauri)                                        │
-│  Static UI (launcher + editor) + embedded Node server  │
-└──────────────────────────┬──────────────────────────────┘
-                           │ http://127.0.0.1:<port>
-┌──────────────────────────▼──────────────────────────────┐
-│  @openmd/server                                         │
-│  Workspace API · Yjs WS · optional Next.js (dev/CLI)    │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         ▼                 ▼                 ▼
-   Local filesystem   Collaborators    Relay (live share)
+```text
+Desktop app or browser UI
+        |
+        v
+@foliage/server
+  - workspace filesystem API
+  - Yjs collaboration WebSocket
+  - Leafmark build API
+  - optional Next.js UI hosting
+        |
+        +--> local filesystem
+        +--> Leafmark PDF/DOCX/HTML outputs
+        +--> collaborators
+        +--> optional live share relay
 ```
 
-| Entry point | What it runs |
-|-------------|--------------|
-| `pnpx openmd` | Full mode: Next.js UI + server |
-| Desktop app (release) | Static exported UI + headless server |
-| `openmd-server --headless` | API + WebSockets only |
-| `openmd-relay` + `openmd-relay-client` | Public tunnel for live share |
+| Entry point                 | What it runs                                        |
+| --------------------------- | --------------------------------------------------- |
+| `pnpx foliage`              | Local Foliage server plus web UI                    |
+| Desktop app                 | Tauri shell plus embedded Foliage server            |
+| `foliage-server --headless` | Workspace API, collaboration, and Leafmark API only |
+| `foliage-relay`             | Public relay for live share                         |
 
-## Repository layout
+## Repository Layout
 
-| Path | Role |
-|------|------|
-| `apps/web/` | Next.js UI — launcher, editor, components, stores |
-| `apps/desktop/` | Tauri shell — native menus, folder dialogs, server lifecycle |
-| `packages/openmd-server/` | Workspace runtime — filesystem API, collaboration, headless mode |
-| `packages/openmd-relay/` | Live share relay + tunnel client |
-| `packages/ui/` | Shared UI components (`@workspace/ui`, shadcn-style) |
-| `bin/openmd.mjs` | CLI entry for `pnpx openmd` |
+| Path                       | Role                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `apps/web/`                | Next.js UI for launcher, editor, Leafmark dialogs, and workspace views           |
+| `apps/desktop/`            | Tauri desktop shell and native integrations                                      |
+| `packages/foliage-server/` | Runtime server for filesystem access, collaboration, Leafmark, and headless mode |
+| `packages/foliage-relay/`  | Relay server and relay client for live share                                     |
+| `packages/ui/`             | Shared UI components                                                             |
+| `bin/foliage.mjs`          | CLI entry for `pnpx foliage`                                                     |
 
-Contributor-oriented internals are documented in `AGENTS.md`.
+## Useful Commands
 
-## Scripts
+| Command                | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `pnpm dev`             | Run development tasks through Turborepo     |
+| `pnpm build`           | Build all packages                          |
+| `pnpm typecheck`       | Type-check all workspaces                   |
+| `pnpm lint`            | Lint all workspaces                         |
+| `pnpm format`          | Format through Turborepo                    |
+| `pnpm desktop:dev`     | Run the Tauri desktop app in development    |
+| `pnpm desktop:build`   | Build desktop release bundles locally       |
+| `pnpm server:headless` | Start a sample headless server on port 8787 |
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start dev tasks via Turborepo |
-| `pnpm build` | Build all packages |
-| `pnpm typecheck` | TypeScript check across workspaces |
-| `pnpm lint` / `pnpm format` | Lint and format via Turbo |
-| `pnpm desktop:dev` | Tauri dev shell |
-| `pnpm desktop:build` | Production desktop bundle |
-| `pnpm server:headless` | Headless server on port 8787 |
+## More Documentation
 
-## Releasing the desktop app
-
-Push a version tag to trigger the GitHub Actions workflow:
-
-```bash
-git tag v0.0.3
-git push origin v0.0.3
-```
-
-Before tagging, bump `version` in `apps/desktop/src-tauri/tauri.conf.json` (and `Cargo.toml` if needed). The workflow builds macOS (arm64 + Intel), Windows, and Linux artifacts and attaches them to the release.
-
-Workflow file: `.github/workflows/release-desktop.yml`
-
-## UI components
-
-This monorepo uses [shadcn/ui](https://ui.shadcn.com/) components in `packages/ui`. Add a component:
-
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
-
-Import in the web app:
-
-```tsx
-import { Button } from '@workspace/ui/components/button'
-```
-
-## Further reading
-
-- `apps/desktop/README.md` — desktop dev, build, and Tauri commands
-- `packages/openmd-server/README.md` — server modes, API, Docker example
-- `packages/openmd-relay/README.md` — relay API and self-hosting
-- `AGENTS.md` — architecture notes for contributors and agents
+- `packages/foliage-server/README.md` - server modes, health checks, and deployment notes
+- `packages/foliage-relay/README.md` - live share relay API and self-hosting
+- `apps/desktop/README.md` - desktop development and Tauri notes
+- `AGENTS.md` - contributor architecture notes

@@ -1,0 +1,24 @@
+{
+  "name": "@foliage/server",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "foliage-server": "./bin/foliage-server.mjs"
+  },
+  "exports": {
+    ".": "./src/create-server.mjs",
+    "./project-template": "./src/lib/project-template.mjs"
+  },
+  "scripts": {
+    "typecheck": "echo 'no types'",
+    "dev": "node bin/foliage-server.mjs"
+  },
+  "dependencies": {
+    "@skxv/leafmark": "^0.2.1",
+    "busboy": "^1.6.0",
+    "next": "16.1.6",
+    "ws": "^8.20.0",
+    "y-websocket": "^1.5.4"
+  }
+}

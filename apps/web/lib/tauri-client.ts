@@ -73,6 +73,15 @@ export const getLocalServerUrl = async (): Promise<string | null> => {
   return invoke<string | null>('get_local_server_url')
 }
 
+export const getDesktopAppVersion = async (): Promise<string | null> => {
+  if (!isTauriRuntime()) {
+    return null
+  }
+
+  const { getVersion } = await import('@tauri-apps/api/app')
+  return getVersion()
+}
+
 export const startLocalServer = async (workspacePath: string): Promise<{ port: number } | null> => {
   if (isTauriRuntime()) {
     const result = await invoke<{ port: number }>('start_local_server', { workspacePath })

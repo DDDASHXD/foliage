@@ -4,7 +4,12 @@ import { backendFetch } from '@/lib/backend-client'
 import { useFilesStore, type WorkspaceEntry } from '@/stores/files.store'
 import { useSettingsStore } from '@/stores/settings.store'
 import { hasAnyOpenEditor } from '@/lib/editor-layout'
-import { OPENMD_PATH_MIME, OPENMD_IS_DIR_MIME } from '@/lib/openmd-dnd'
+import {
+  FOLIAGE_IS_DIR_MIME,
+  getFoliagePath,
+  hasFoliagePath,
+  setFoliageDragData,
+} from '@/lib/foliage-dnd'
 import {
   getDropTargetDirectory,
   getWorkspaceParentDir,
@@ -126,9 +131,9 @@ const isInvalidTreeMove = (dragPath: string, dragIsDir: boolean, toDir: string) 
 }
 
 const updateTreeDropHighlight = (event: React.DragEvent, highlight: WorkspaceDropHighlight) => {
-  const types = [...event.dataTransfer.types]
-  const isInternal = types.includes(OPENMD_PATH_MIME)
-  const isExternalFiles = types.includes('Files')
+  const types = [...event.dataTransfer.types].map((type) => type.toLowerCase())
+  const isInternal = hasFoliagePath(event.dataTransfer)
+  const isExternalFiles = types.includes('files')
 
   if (!isInternal && !isExternalFiles) {
     return
@@ -252,7 +257,13 @@ const DirectoryChildren = ({
   return (
     <>
       {filteredEntries.map((entry) => (
-        <TreeItem key={entry.path} entry={entry} depth={depth} onDirectoryChange={loadEntries} onWorkspaceDrop={onWorkspaceDrop} />
+        <TreeItem
+          key={entry.path}
+          entry={entry}
+          depth={depth}
+          onDirectoryChange={loadEntries}
+          onWorkspaceDrop={onWorkspaceDrop}
+        />
       ))}
     </>
   )
@@ -294,8 +305,9 @@ const TreeItem = ({
       workspaceDropHighlight.filePath === entry.path)
 
   const handleDragStart = (event: React.DragEvent) => {
-    event.dataTransfer.setData(OPENMD_PATH_MIME, entry.path)
-    event.dataTransfer.setData(OPENMD_IS_DIR_MIME, entry.type === 'directory' ? '1' : '0')
+    setFoliageDragData(event.dataTransfer, entry.path, {
+      isDirectory: entry.type === 'directory',
+    })
     event.dataTransfer.effectAllowed = 'move'
     setFileDragActive(true)
     useFilesStore.getState().setTreeDragSource(entry.path, entry.type === 'directory')
@@ -309,12 +321,11 @@ const TreeItem = ({
   const handleFileDragOver = (event: React.DragEvent) => {
     updateTreeDropHighlight(event, { kind: 'sibling-of-file', filePath: entry.path })
   }
-  
+
   const handleFolderDragOver = (event: React.DragEvent) => {
     updateTreeDropHighlight(event, { kind: 'folder', path: entry.path })
   }
 
-  
   const handleDrop = (event: React.DragEvent, targetPath: string) => {
     onWorkspaceDrop(event, targetPath, () => onDirectoryChange?.())
   }
@@ -340,7 +351,9 @@ const TreeItem = ({
         openFile(createdEntry.path)
       }
     } catch (error) {
-      setErrorAlertMessage(error instanceof Error ? error.message : `Failed to create ${promptType}.`)
+      setErrorAlertMessage(
+        error instanceof Error ? error.message : `Failed to create ${promptType}.`,
+      )
       setErrorAlertOpen(true)
     }
   }
@@ -393,41 +406,43 @@ const TreeItem = ({
   return (
     <>
       <ContextMenu>
-        <ContextMenuTrigger>
-          <button
-            type="button"
-            className={cn(
-              'hover:bg-muted flex h-7 w-full items-center gap-1 truncate px-2 text-left text-sm',
-              activeEditorPath === entry.path && 'bg-muted text-foreground',
-              isDirectory && 'cursor-pointer',
-              isDropTarget && 'bg-primary/15 ring-primary/50 ring-2 ring-inset',
-            )}
-            style={{ paddingLeft: depth * 14 + 8 }}
-            title={entry.path}
-            draggable
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragOver={isDirectory ? handleFolderDragOver : handleFileDragOver}
-            onDrop={(event) => {
-              if (isDirectory) {
-                handleDrop(event, entry.path)
-              } else {
-                handleDrop(event, getWorkspaceParentDir(entry.path))
-              }
-            }}
-            onClick={() => {
-              if (isDirectory) {
-                setOpen((value) => !value)
-              } else {
-                openFile(entry.path)
-              }
-            }}
-          >
-            <span className="text-muted-foreground flex h-4 w-4 shrink-0 items-center justify-center text-xs">
-              {isDirectory ? (open ? '⌄' : '›') : ''}
-            </span>
-            <span className={cn('truncate', isDirectory && 'text-foreground')}>{entry.name}</span>
-          </button>
+        <ContextMenuTrigger
+          render={
+            <button
+              type="button"
+              draggable
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDragOver={isDirectory ? handleFolderDragOver : handleFileDragOver}
+              onDrop={(event) => {
+                if (isDirectory) {
+                  handleDrop(event, entry.path)
+                } else {
+                  handleDrop(event, getWorkspaceParentDir(entry.path))
+                }
+              }}
+              onClick={() => {
+                if (isDirectory) {
+                  setOpen((value) => !value)
+                } else {
+                  openFile(entry.path)
+                }
+              }}
+            />
+          }
+          className={cn(
+            'hover:bg-muted flex h-7 w-full items-center gap-1 truncate px-2 text-left text-sm',
+            activeEditorPath === entry.path && 'bg-muted text-foreground',
+            isDirectory && 'cursor-pointer',
+            isDropTarget && 'bg-primary/15 ring-primary/50 ring-2 ring-inset',
+          )}
+          style={{ paddingLeft: depth * 14 + 8 }}
+          title={entry.path}
+        >
+          <span className="text-muted-foreground flex h-4 w-4 shrink-0 items-center justify-center text-xs">
+            {isDirectory ? (open ? '⌄' : '›') : ''}
+          </span>
+          <span className={cn('truncate', isDirectory && 'text-foreground')}>{entry.name}</span>
         </ContextMenuTrigger>
         {isDirectory && (
           <ContextMenuContent>
@@ -449,7 +464,12 @@ const TreeItem = ({
         )}
       </ContextMenu>
       {isDirectory && open && (
-        <DirectoryChildren path={entry.path} depth={depth + 1} refreshSignal={childRefreshKey} onWorkspaceDrop={onWorkspaceDrop} />
+        <DirectoryChildren
+          path={entry.path}
+          depth={depth + 1}
+          refreshSignal={childRefreshKey}
+          onWorkspaceDrop={onWorkspaceDrop}
+        />
       )}
       <PromptDialog
         open={promptOpen}
@@ -527,7 +547,9 @@ const Sidebar = () => {
         useFilesStore.getState().openFile(createdEntry.path)
       }
     } catch (error) {
-      setErrorAlertMessage(error instanceof Error ? error.message : `Failed to create ${promptType}.`)
+      setErrorAlertMessage(
+        error instanceof Error ? error.message : `Failed to create ${promptType}.`,
+      )
       setErrorAlertOpen(true)
     }
   }
@@ -576,7 +598,7 @@ const Sidebar = () => {
     event.stopPropagation()
     useFilesStore.getState().clearTreeDragUi()
 
-    const hasInternalPath = [...event.dataTransfer.types].includes(OPENMD_PATH_MIME)
+    const hasInternalPath = hasFoliagePath(event.dataTransfer)
     const fileList = event.dataTransfer.files
 
     if (!hasInternalPath && fileList.length > 0) {
@@ -609,7 +631,9 @@ const Sidebar = () => {
               throw new Error(msg)
             }
           } catch (error) {
-            showUploadError(error instanceof Error ? error.message : `Failed to upload ${file.name}.`)
+            showUploadError(
+              error instanceof Error ? error.message : `Failed to upload ${file.name}.`,
+            )
             return
           }
         }
@@ -623,8 +647,8 @@ const Sidebar = () => {
       return
     }
 
-    const dragPath = event.dataTransfer.getData(OPENMD_PATH_MIME)
-    const isDirDrag = event.dataTransfer.getData(OPENMD_IS_DIR_MIME) === '1'
+    const dragPath = getFoliagePath(event.dataTransfer)
+    const isDirDrag = event.dataTransfer.getData(FOLIAGE_IS_DIR_MIME) === '1'
     if (!dragPath || isInvalidTreeMove(dragPath, isDirDrag, toDirectory)) {
       return
     }
@@ -665,7 +689,13 @@ const Sidebar = () => {
             onDragOver={handleRootDragOver}
             onDrop={handleRootDrop}
           >
-            <DirectoryChildren key={refreshKey} path="" depth={0} refreshSignal={refreshKey} onWorkspaceDrop={handleWorkspaceDrop} />
+            <DirectoryChildren
+              key={refreshKey}
+              path=""
+              depth={0}
+              refreshSignal={refreshKey}
+              onWorkspaceDrop={handleWorkspaceDrop}
+            />
           </div>
         </aside>
       </ContextMenuTrigger>

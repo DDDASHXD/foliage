@@ -62,7 +62,7 @@ export const LiveShareDialog = ({ open, onOpenChange }: LiveShareDialogProps) =>
         <DialogHeader>
           <DialogTitle>Live share</DialogTitle>
           <DialogDescription>
-            Share this project through a relay. Default relay: openmd.skxv.dev (self-hosted relays
+            Share this project through a relay. Default relay: foliage.skxv.dev (self-hosted relays
             supported).
           </DialogDescription>
         </DialogHeader>
@@ -74,7 +74,7 @@ export const LiveShareDialog = ({ open, onOpenChange }: LiveShareDialogProps) =>
               id="relay-url"
               value={relayUrl}
               onChange={(event) => setRelayUrl(event.target.value)}
-              placeholder="https://openmd.skxv.dev"
+              placeholder="https://foliage.skxv.dev"
             />
           </div>
 

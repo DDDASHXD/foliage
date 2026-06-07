@@ -45,7 +45,7 @@ pub fn shell_workspace() -> PathBuf {
     let home = std::env::var("HOME")
         .or_else(|_| std::env::var("USERPROFILE"))
         .unwrap_or_else(|_| ".".to_string());
-    let shell_dir = PathBuf::from(home).join(".openmd").join("shell");
+    let shell_dir = PathBuf::from(home).join(".foliage").join("shell");
 
     if let Err(error) = std::fs::create_dir_all(&shell_dir) {
         eprintln!("Unable to create shell workspace: {error}");
@@ -60,10 +60,10 @@ pub fn resolve_paths() -> Result<RuntimePaths, String> {
 
         return Ok(RuntimePaths {
             node: PathBuf::from("node"),
-            server_script: repo.join("packages/openmd-server/bin/openmd-server.mjs"),
+            server_script: repo.join("packages/foliage-server/bin/foliage-server.mjs"),
             app_dir: Some(repo.join("apps/web")),
-            relay_script: repo.join("packages/openmd-relay/bin/openmd-relay-client.mjs"),
-            project_template: repo.join("packages/openmd-server/src/lib/project-template.mjs"),
+            relay_script: repo.join("packages/foliage-relay/bin/foliage-relay-client.mjs"),
+            project_template: repo.join("packages/foliage-server/src/lib/project-template.mjs"),
             working_dir: repo,
             headless: false,
         });
@@ -79,7 +79,7 @@ pub fn resolve_paths() -> Result<RuntimePaths, String> {
         .map_err(|error| error.to_string())?;
 
     let bundle_root = resource_dir.join("resources");
-    let server_dir = bundle_root.join("openmd-server");
+    let server_dir = bundle_root.join("foliage-server");
     let node_binary = if cfg!(windows) {
         bundle_root.join("node/bin/node.exe")
     } else {
@@ -88,9 +88,9 @@ pub fn resolve_paths() -> Result<RuntimePaths, String> {
 
     Ok(RuntimePaths {
         node: node_binary,
-        server_script: server_dir.join("bin/openmd-server.mjs"),
+        server_script: server_dir.join("bin/foliage-server.mjs"),
         app_dir: None,
-        relay_script: bundle_root.join("openmd-relay/openmd-relay-client.mjs"),
+        relay_script: bundle_root.join("foliage-relay/foliage-relay-client.mjs"),
         project_template: server_dir.join("src/lib/project-template.mjs"),
         working_dir: server_dir,
         headless: true,
@@ -151,7 +151,7 @@ fn wait_for_health(port: u16) -> Result<(), String> {
         std::thread::sleep(Duration::from_millis(200));
     }
 
-    Err("Timed out waiting for openmd-server.".to_string())
+    Err("Timed out waiting for foliage-server.".to_string())
 }
 
 pub fn stop_server() -> Result<(), String> {
@@ -270,7 +270,7 @@ fn spawn_server(paths: &RuntimePaths, workspace_path: &str, port: u16) -> Result
 
     command
         .spawn()
-        .map_err(|error| format!("Failed to start openmd-server: {error}"))
+        .map_err(|error| format!("Failed to start foliage-server: {error}"))
 }
 
 pub fn start_server(workspace_path: &str) -> Result<u16, String> {
@@ -298,7 +298,7 @@ pub fn start_server(workspace_path: &str) -> Result<u16, String> {
             let mut output = String::new();
             let _ = stderr.read_to_string(&mut output);
             if !output.is_empty() {
-                eprintln!("openmd-server stderr:\n{output}");
+                eprintln!("foliage-server stderr:\n{output}");
             }
         }
 

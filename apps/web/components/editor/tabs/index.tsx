@@ -5,7 +5,12 @@ import { useCollaborationStore } from '@/stores/collaboration.store'
 import { useFilesStore, type OpenFile } from '@/stores/files.store'
 import { cn } from '@workspace/ui/lib/utils'
 import { Toggle } from '@workspace/ui/components/toggle'
-import { OPENMD_PATH_MIME, OPENMD_SOURCE_GROUP_MIME, isTreeDirectoryDrag } from '@/lib/openmd-dnd'
+import {
+  getFoliagePath,
+  hasFoliagePath,
+  isTreeDirectoryDrag,
+  setFoliageDragData,
+} from '@/lib/foliage-dnd'
 import { isMarkdownFile } from '@/lib/workspace-editor-kind'
 import { Eye, X } from 'lucide-react'
 
@@ -50,8 +55,7 @@ const TabRow = ({
   }
 
   const handleDragStart = (event: React.DragEvent) => {
-    event.dataTransfer.setData(OPENMD_PATH_MIME, path)
-    event.dataTransfer.setData(OPENMD_SOURCE_GROUP_MIME, groupId)
+    setFoliageDragData(event.dataTransfer, path, { sourceGroupId: groupId })
     event.dataTransfer.effectAllowed = 'move'
     setFileDragActive(true)
     useFilesStore.getState().setTreeDragSource(path, false)
@@ -62,7 +66,7 @@ const TabRow = ({
   }
 
   const handleDragOver = (event: React.DragEvent) => {
-    if (![...event.dataTransfer.types].includes(OPENMD_PATH_MIME)) {
+    if (!hasFoliagePath(event.dataTransfer)) {
       return
     }
     event.preventDefault()
@@ -72,7 +76,7 @@ const TabRow = ({
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault()
     event.stopPropagation()
-    const dragPath = event.dataTransfer.getData(OPENMD_PATH_MIME)
+    const dragPath = getFoliagePath(event.dataTransfer)
     if (!dragPath) {
       return
     }
@@ -133,9 +137,11 @@ const EditorTabs = ({ groupId }: { groupId: string }) => {
   const openFiles = group?.openFiles ?? []
   const activeFile = group?.activeFile ?? null
   const showPreviewToggle = Boolean(activeFile && isMarkdownFile(activeFile))
+  const remoteCollaborators = collaborators.filter((collaborator) => !collaborator.isLocal)
+  const showToolbar = openFiles.length > 0 && (showPreviewToggle || remoteCollaborators.length > 0)
 
   const handleStripDragOver = (event: React.DragEvent) => {
-    if ([...event.dataTransfer.types].includes(OPENMD_PATH_MIME)) {
+    if (hasFoliagePath(event.dataTransfer)) {
       event.preventDefault()
       event.dataTransfer.dropEffect = 'move'
     }
@@ -143,7 +149,7 @@ const EditorTabs = ({ groupId }: { groupId: string }) => {
 
   const handleStripDrop = (event: React.DragEvent) => {
     event.preventDefault()
-    const dragPath = event.dataTransfer.getData(OPENMD_PATH_MIME)
+    const dragPath = getFoliagePath(event.dataTransfer)
     if (!dragPath) {
       return
     }
@@ -187,27 +193,31 @@ const EditorTabs = ({ groupId }: { groupId: string }) => {
           onDragEnd={handleStripDragStartCleanup}
         />
       </div>
-      {openFiles.length > 0 && collaborators.some((collaborator) => !collaborator.isLocal) && (
+      {showToolbar && (
         <div className="px-4 py-2 pl-6 flex gap-2 items-center border-b">
-          <div className="avatars flex">
-            {collaborators.filter((c) => !c.isLocal).slice(0, 3).map((collaborator) => (
-              <div
-                key={collaborator.id}
-                className="size-6 bg-background rounded-full -ml-2 relative isolate p-[3px]"
-                title={collaborator.name}
-              >
-                <div
-                  className="w-full h-full rounded-full border"
-                  style={{ backgroundColor: collaborator.color }}
-                />
+          {remoteCollaborators.length > 0 && (
+            <>
+              <div className="avatars flex">
+                {remoteCollaborators.slice(0, 3).map((collaborator) => (
+                  <div
+                    key={collaborator.id}
+                    className="size-6 bg-background rounded-full -ml-2 relative isolate p-[3px]"
+                    title={collaborator.name}
+                  >
+                    <div
+                      className="w-full h-full rounded-full border"
+                      style={{ backgroundColor: collaborator.color }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <p className="text-xs">
-            {collaborators.filter((c) => !c.isLocal).length === 1
-              ? '1 collaborator here'
-              : `${collaborators.filter((c) => !c.isLocal).length} collaborators here`}
-          </p>
+              <p className="text-xs">
+                {remoteCollaborators.length === 1
+                  ? '1 collaborator here'
+                  : `${remoteCollaborators.length} collaborators here`}
+              </p>
+            </>
+          )}
           {showPreviewToggle && (
             <Toggle
               pressed={previewOpen}

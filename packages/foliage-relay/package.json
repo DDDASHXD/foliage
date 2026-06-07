@@ -1,0 +1,20 @@
+{
+  "name": "@foliage/relay",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "foliage-relay": "./bin/foliage-relay.mjs",
+    "foliage-relay-client": "./bin/foliage-relay-client.mjs"
+  },
+  "exports": {
+    ".": "./src/server.mjs",
+    "./client": "./src/relay-client.mjs"
+  },
+  "scripts": {
+    "dev": "node bin/foliage-relay.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.20.0"
+  }
+}

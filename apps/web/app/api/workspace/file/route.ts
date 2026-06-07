@@ -3,7 +3,7 @@ import path from 'path'
 import { NextRequest, NextResponse } from 'next/server'
 
 const getWorkspaceRoot = () =>
-  process.env.OPENMD_WORKSPACE ? path.resolve(process.env.OPENMD_WORKSPACE) : process.cwd()
+  process.env.FOLIAGE_WORKSPACE ? path.resolve(process.env.FOLIAGE_WORKSPACE) : process.cwd()
 
 const resolveWorkspacePath = (relativePath: string) => {
   const cleanPath = relativePath.replaceAll('\\', '/').replace(/^\/+/, '')

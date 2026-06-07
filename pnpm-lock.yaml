@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@openmd/relay':
+      '@foliage/relay':
         specifier: workspace:*
-        version: link:packages/openmd-relay
-      '@openmd/server':
+        version: link:packages/foliage-relay
+      '@foliage/server':
         specifier: workspace:*
-        version: link:packages/openmd-server
+        version: link:packages/foliage-server
     devDependencies:
       '@workspace/eslint-config':
         specifier: workspace:*
@@ -36,9 +36,9 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@openmd/server':
+      '@foliage/server':
         specifier: workspace:*
-        version: link:../../packages/openmd-server
+        version: link:../../packages/foliage-server
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2.2.7
@@ -55,15 +55,15 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.4)
+      '@foliage/server':
+        specifier: workspace:*
+        version: link:../../packages/foliage-server
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@openmd/server':
-        specifier: workspace:*
-        version: link:../../packages/openmd-server
       '@skxv/leafmark':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.2.1
+        version: 0.2.1
       '@tauri-apps/api':
         specifier: ^2.2.0
         version: 2.11.0
@@ -192,17 +192,17 @@ importers:
         specifier: ^8.54.0
         version: 8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
 
-  packages/openmd-relay:
+  packages/foliage-relay:
     dependencies:
       ws:
         specifier: ^8.20.0
         version: 8.20.0
 
-  packages/openmd-server:
+  packages/foliage-server:
     dependencies:
       '@skxv/leafmark':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.2.1
+        version: 0.2.1
       busboy:
         specifier: ^1.6.0
         version: 1.6.0
@@ -1404,8 +1404,8 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
-  '@skxv/leafmark@0.1.9':
-    resolution: {integrity: sha512-uliVnPc3Y9WkWEZFxdN72Nun1A8c0+/Do6TRnfKRGebYDw3PKItoEGYVh0FRSqwmV4UnUNq4DfUd5JtwoTazyQ==}
+  '@skxv/leafmark@0.2.1':
+    resolution: {integrity: sha512-Gqb2qmN2SrdDOLOB7Ab1q7eRcAYFZ0JL15etc/dQPwH18pO1b1Waa2tv1jwm6DM55Q3jriHoMh3/xWgHeAulsA==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -5657,7 +5657,7 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@skxv/leafmark@0.1.9':
+  '@skxv/leafmark@0.2.1':
     dependencies:
       chokidar: 3.6.0
       yaml: 2.9.0

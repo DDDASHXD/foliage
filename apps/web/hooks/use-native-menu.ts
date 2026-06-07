@@ -12,7 +12,6 @@ const menuActionIds = new Set<MenuActionId>([
   'open_project',
   'close_project',
   'leafmark',
-  'export',
   'live_share',
   'about',
   'report_bug',

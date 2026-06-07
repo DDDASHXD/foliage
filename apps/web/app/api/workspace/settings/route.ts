@@ -19,7 +19,7 @@ const defaultSettings = {
   workspace: {
     maxDirectoryEntries: 500,
     maxUploadBytes: 104857600,
-    ignoredDirectories: ['.git', '.next', '.turbo', '.openmd'],
+    ignoredDirectories: ['.git', '.next', '.turbo', '.foliage'],
     showHiddenFiles: false,
   },
   leafmark: {
@@ -34,7 +34,7 @@ const defaultSettings = {
 
 const getWorkspaceRoot = () => {
   // In dev mode with custom server, we need to match the server's workspace
-  const serverWorkspace = process.env.OPENMD_WORKSPACE
+  const serverWorkspace = process.env.FOLIAGE_WORKSPACE
   if (serverWorkspace) {
     return path.resolve(serverWorkspace)
   }
@@ -42,12 +42,12 @@ const getWorkspaceRoot = () => {
   return process.cwd()
 }
 
-const getSettingsPath = () => path.join(getWorkspaceRoot(), '.openmd', 'settings.json')
+const getSettingsPath = () => path.join(getWorkspaceRoot(), '.foliage', 'settings.json')
 
-const ensureOpenmdFolder = async () => {
-  const openmdPath = path.join(getWorkspaceRoot(), '.openmd')
+const ensureFoliageFolder = async () => {
+  const foliagePath = path.join(getWorkspaceRoot(), '.foliage')
   try {
-    await fs.mkdir(openmdPath, { recursive: true })
+    await fs.mkdir(foliagePath, { recursive: true })
   } catch {
     // Folder may already exist
   }
@@ -82,7 +82,7 @@ const loadSettings = async () => {
 }
 
 const saveSettings = async (newSettings: Record<string, unknown>) => {
-  await ensureOpenmdFolder()
+  await ensureFoliageFolder()
   const settingsPath = getSettingsPath()
 
   // First load existing settings
@@ -110,7 +110,7 @@ const saveSettings = async (newSettings: Record<string, unknown>) => {
 
 export async function GET() {
   try {
-    await ensureOpenmdFolder()
+    await ensureFoliageFolder()
     const settings = await loadSettings()
     return NextResponse.json({ settings })
   } catch (error) {

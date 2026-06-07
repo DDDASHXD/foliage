@@ -1,6 +1,6 @@
-# OpenMD Desktop (Tauri)
+# Foliage Desktop (Tauri)
 
-Desktop shell that spawns an embedded `openmd-server`, shows the Obsidian-style launcher, and opens the editor workspace.
+Desktop shell that spawns an embedded `foliage-server`, shows the Obsidian-style launcher, and opens the editor workspace.
 
 ## Requirements
 
@@ -27,11 +27,11 @@ pnpm --filter desktop dev:stop
 pnpm desktop:dev
 ```
 
-`tauri dev` runs `pnpm run dev:server` first, which starts `openmd-server` on `http://127.0.0.1:3000/launcher`. Tauri waits for that URL, then opens the desktop window.
+`tauri dev` runs `pnpm run dev:server` first, which starts `foliage-server` on `http://127.0.0.1:3000/launcher`. Tauri waits for that URL, then opens the desktop window.
 
 On first launch the app:
 
-1. Starts `openmd-server` with a shell workspace at `~/.openmd/shell`
+1. Starts `foliage-server` with a shell workspace at `~/.foliage/shell`
 2. Loads `http://127.0.0.1:<port>/launcher`
 3. Restarts the server with the chosen project workspace when you open/create a project
 
@@ -63,10 +63,10 @@ GitHub release builds are ad-hoc signed (not notarized). After copying the app o
 **Fix:**
 
 ```bash
-xattr -cr /Applications/openmd.app
+xattr -cr /Applications/foliage.app
 ```
 
-Or right-click **openmd.app** → **Open** → **Open** again.
+Or right-click **foliage.app** → **Open** → **Open** again.
 
 For a fully trusted install (no workaround), set up Apple Developer code signing + notarization in CI. See [Tauri macOS signing](https://v2.tauri.app/distribute/sign/macos/).
 

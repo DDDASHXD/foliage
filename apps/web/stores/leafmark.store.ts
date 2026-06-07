@@ -68,6 +68,8 @@ interface LeafmarkStore {
 }
 
 const defaultBuildOptions: LeafmarkBuildOptions = {
+  output: 'dist',
+  outputFormat: 'pdf',
   html: false,
   htmlOnly: false,
   noMergeCover: false,
@@ -313,10 +315,11 @@ export const useLeafmarkStore = create<LeafmarkStore>()((set, get) => ({
       set({ lastBuild: result, lastLog: 'Build completed successfully.' })
       useFilesStore.getState().bumpWorkspace()
 
-      if (result.outputs.pdf) {
-        useFilesStore.getState().openFile(result.outputs.pdf)
-      } else if (result.outputs.html) {
-        useFilesStore.getState().openFile(result.outputs.html)
+      const primaryOutput =
+        result.outputs.pdf ?? result.outputs.docx ?? result.outputs.html ?? null
+
+      if (primaryOutput) {
+        useFilesStore.getState().openFile(primaryOutput)
       }
 
       return result

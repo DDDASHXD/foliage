@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import os from 'os'
 
-const WORKSPACE_ROOT = path.join(os.homedir(), '.openmd', 'workspace')
+const WORKSPACE_ROOT = path.join(os.homedir(), '.foliage', 'workspace')
 
 async function ensureWorkspaceExists() {
   try {
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 }
 
 function getWorkspaceRoot() {
-  return process.env.OPENMD_WORKSPACE ? path.resolve(process.env.OPENMD_WORKSPACE) : process.cwd()
+  return process.env.FOLIAGE_WORKSPACE ? path.resolve(process.env.FOLIAGE_WORKSPACE) : process.cwd()
 }
 
 function resolveWorkspacePathApi(relativePath: string) {

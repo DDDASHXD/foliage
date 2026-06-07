@@ -5,7 +5,7 @@ import process from 'process'
 export const runtime = 'nodejs'
 
 const getWorkspaceRoot = () => {
-  const serverWorkspace = process.env.OPENMD_WORKSPACE
+  const serverWorkspace = process.env.FOLIAGE_WORKSPACE
 
   if (serverWorkspace) {
     return path.resolve(serverWorkspace)

@@ -4,7 +4,7 @@ import { MonacoEditor } from '@/components/editor/monaco-editor'
 import { MarkdownPreview } from '@/components/editor/markdown-preview'
 import { PdfViewer } from '@/components/editor/pdf-viewer'
 import { getWorkspaceEditorKind, isMarkdownFile } from '@/lib/workspace-editor-kind'
-import { OPENMD_PATH_MIME, isTreeDirectoryDrag } from '@/lib/openmd-dnd'
+import { getFoliagePath, hasFoliagePath, isTreeDirectoryDrag } from '@/lib/foliage-dnd'
 import { useFilesStore } from '@/stores/files.store'
 import React from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
@@ -22,7 +22,7 @@ export const EditorPane = ({ groupId }: EditorPaneProps) => {
   const showMarkdownPreview = Boolean(activeFile && previewOpen && isMarkdownFile(activeFile))
 
   const handleDragOver = (event: React.DragEvent) => {
-    if (![...event.dataTransfer.types].includes(OPENMD_PATH_MIME)) {
+    if (!hasFoliagePath(event.dataTransfer)) {
       return
     }
     event.preventDefault()
@@ -35,7 +35,7 @@ export const EditorPane = ({ groupId }: EditorPaneProps) => {
     if (isTreeDirectoryDrag(event.dataTransfer)) {
       return
     }
-    const path = event.dataTransfer.getData(OPENMD_PATH_MIME)
+    const path = getFoliagePath(event.dataTransfer)
     if (!path) {
       return
     }

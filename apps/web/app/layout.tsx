@@ -9,6 +9,15 @@ import { CommandPaletteProvider } from '@/hooks/use-command-palette'
 import { SettingsProvider } from '@/components/settings-provider'
 import { cn } from '@workspace/ui/lib/utils'
 
+export const metadata = {
+  title: 'foliage',
+  description: 'A local-first markdown and code workspace',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/brand/app-icon.svg',
+  },
+}
+
 const fontSans = Geist({
   subsets: ['latin'],
   variable: '--font-sans',

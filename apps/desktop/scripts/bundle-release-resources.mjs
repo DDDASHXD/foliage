@@ -16,14 +16,14 @@ const normalizeNodeArch = (arch) => {
   return arch
 }
 
-const bundledNodeArch = () => normalizeNodeArch(process.env.OPENMD_BUNDLE_NODE_ARCH ?? process.arch)
+const bundledNodeArch = () => normalizeNodeArch(process.env.FOLIAGE_BUNDLE_NODE_ARCH ?? process.arch)
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url))
 const desktopDirectory = path.resolve(scriptDirectory, '..')
 const repoRoot = path.resolve(desktopDirectory, '../..')
 const resourcesDirectory = path.join(desktopDirectory, 'src-tauri/resources')
-const serverDirectory = path.join(resourcesDirectory, 'openmd-server')
-const relayDirectory = path.join(resourcesDirectory, 'openmd-relay')
+const serverDirectory = path.join(resourcesDirectory, 'foliage-server')
+const relayDirectory = path.join(resourcesDirectory, 'foliage-relay')
 const nodeDirectory = path.join(resourcesDirectory, 'node')
 
 const nodeVersion = '20.19.5'
@@ -82,7 +82,7 @@ const pnpmCommand = () => {
 
 const downloadBundledNode = async () => {
   const archiveName = nodeArchiveName()
-  const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'openmd-node-'))
+  const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'foliage-node-'))
 
   await fs.rm(nodeDirectory, { recursive: true, force: true })
   await fs.mkdir(path.join(nodeDirectory, 'bin'), { recursive: true })
@@ -181,18 +181,18 @@ const copyRelayClient = async () => {
   await fs.mkdir(relayDirectory, { recursive: true })
 
   await fs.cp(
-    path.join(repoRoot, 'packages/openmd-relay/bin/openmd-relay-client.mjs'),
-    path.join(relayDirectory, 'openmd-relay-client.mjs'),
+    path.join(repoRoot, 'packages/foliage-relay/bin/foliage-relay-client.mjs'),
+    path.join(relayDirectory, 'foliage-relay-client.mjs'),
   )
 }
 
 await fs.rm(resourcesDirectory, { recursive: true, force: true })
 await fs.mkdir(resourcesDirectory, { recursive: true })
 
-const deployTarget = path.join('apps', 'desktop', 'src-tauri', 'resources', 'openmd-server')
+const deployTarget = path.join('apps', 'desktop', 'src-tauri', 'resources', 'foliage-server')
 
 runCommand(
-  `${pnpmCommand()} --filter @openmd/server deploy --config.node-linker=hoisted ${deployTarget}`,
+  `${pnpmCommand()} --filter @foliage/server deploy --config.node-linker=hoisted ${deployTarget}`,
   { cwd: repoRoot },
 )
 

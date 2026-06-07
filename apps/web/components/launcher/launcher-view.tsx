@@ -11,12 +11,13 @@ import {
   openEditorWindow,
   pickFolder,
   startLocalServer,
+  getDesktopAppVersion,
 } from '@/lib/tauri-client'
 import { useSessionStore } from '@/stores/session.store'
 import { Button } from '@workspace/ui/components/button'
 import { cn } from '@workspace/ui/lib/utils'
 
-const appVersion = process.env.NEXT_PUBLIC_OPENMD_VERSION ?? '0.0.1'
+const appVersion = process.env.NEXT_PUBLIC_FOLIAGE_VERSION ?? '0.0.1'
 
 export const LauncherView = () => {
   const router = useRouter()
@@ -29,6 +30,15 @@ export const LauncherView = () => {
   const [createOpen, setCreateOpen] = React.useState(false)
   const [busy, setBusy] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [displayVersion, setDisplayVersion] = React.useState(appVersion)
+
+  React.useEffect(() => {
+    void getDesktopAppVersion().then((version) => {
+      if (version) {
+        setDisplayVersion(version)
+      }
+    })
+  }, [])
 
   const enterEditor = React.useCallback(async () => {
     await openEditorWindow()
@@ -109,9 +119,7 @@ export const LauncherView = () => {
     <div className="bg-background text-foreground flex h-screen w-screen">
       <aside className="border-border flex w-64 shrink-0 flex-col border-r">
         <div className="border-border border-b px-4 py-3">
-          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-            Recent projects
-          </p>
+          <p className="text-muted-foreground text-xs font-medium uppercase">Recent projects</p>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-2">
@@ -151,9 +159,10 @@ export const LauncherView = () => {
 
       <main className="flex min-w-0 flex-1 flex-col items-center justify-center px-8">
         <div className="flex w-full max-w-md flex-col gap-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-semibold tracking-tight">openmd</h1>
-            <p className="text-muted-foreground mt-1 text-sm">v{appVersion}</p>
+          <div className="flex flex-col items-center text-center">
+            <h1 className="sr-only">foliage</h1>
+            <img src="/brand/logo-text.svg" alt="foliage" className="h-auto w-72 max-w-full" />
+            <p className="text-muted-foreground mt-1 text-sm">v{displayVersion}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -195,7 +204,7 @@ export const LauncherView = () => {
               <div className="text-left">
                 <p className="font-medium">Connect to server</p>
                 <p className="text-muted-foreground text-xs">
-                  Join a remote or live-shared openmd server
+                  Join a remote or live-shared foliage server
                 </p>
               </div>
             </Button>

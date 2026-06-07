@@ -1,4 +1,3 @@
-import { exportMarkdownFiles } from '@/lib/export-markdown'
 import { getLocalServerUrl, isTauri, returnToLauncher } from '@/lib/tauri-client'
 import { useLeafmarkStore } from '@/stores/leafmark.store'
 import { useMenuUiStore } from '@/stores/menu-ui.store'
@@ -8,7 +7,6 @@ export type MenuActionId =
   | 'open_project'
   | 'close_project'
   | 'leafmark'
-  | 'export'
   | 'live_share'
   | 'about'
   | 'report_bug'
@@ -45,18 +43,6 @@ export const executeMenuAction = async (
       return
     }
 
-    case 'export': {
-      try {
-        await exportMarkdownFiles()
-      } catch (error) {
-        useMenuUiStore
-          .getState()
-          .setExportError(error instanceof Error ? error.message : 'Export failed.')
-      }
-
-      return
-    }
-
     case 'live_share': {
       useMenuUiStore.getState().setLiveShareOpen(true)
       return
@@ -68,7 +54,7 @@ export const executeMenuAction = async (
     }
 
     case 'report_bug': {
-      window.open('https://github.com/DDDASHXD/openmd/issues/new', '_blank', 'noopener,noreferrer')
+      window.open('https://github.com/DDDASHXD/foliage/issues/new', '_blank', 'noopener,noreferrer')
       return
     }
 

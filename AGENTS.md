@@ -1,10 +1,10 @@
-# OpenMD – Agent Handbook
+# Foliage – Agent Handbook
 
 This document is for automated agents and new contributors. It explains how the repo is organized, where behavior actually runs, and how to extend it without breaking layout, the workspace API, or collaboration.
 
 ## What this project is
 
-OpenMD is a local-first markdown/code workspace UI: file tree, multi-pane editor (Monaco for text), tiling via drag-to-edge splits, and Yjs-based collaboration over WebSockets. The desktop/CLI entry is `openmd` (see `bin/openmd.mjs`), which boots the custom Node server in `apps/web/server.mjs`.
+Foliage is a local-first markdown/code workspace UI: file tree, multi-pane editor (Monaco for text), tiling via drag-to-edge splits, and Yjs-based collaboration over WebSockets. The desktop/CLI entry is `foliage` (see `bin/foliage.mjs`), which boots the custom Node server in `apps/web/server.mjs`.
 
 Package manager: **pnpm** (see root `packageManager`). Node **>= 20**. Orchestration: **Turborepo** (`turbo.json`).
 
@@ -14,13 +14,13 @@ Package manager: **pnpm** (see root `packageManager`). Node **>= 20**. Orchestra
 |------|------|
 | `apps/web/` | Next.js 16 app (UI, `app/`, components, API route files) |
 | `apps/web/server.mjs` | **Authoritative runtime** for HTTP upgrade, workspace file API, and collaboration WS |
-| `bin/openmd.mjs` | Delegates to `apps/web/server.mjs` |
+| `bin/foliage.mjs` | Delegates to `apps/web/server.mjs` |
 | `packages/ui/` | Shared shadcn-style components (`@workspace/ui`) |
 | `packages/eslint-config/`, `packages/typescript-config/` | Shared tooling |
 
 Workspace APIs exist both as **Next route handlers** under `apps/web/app/api/workspace/` and as **inline handlers inside `server.mjs`**. In normal dev/prod you run **`node server.mjs`** (or `pnpm dev` in `apps/web`). The custom server **handles `/api/workspace` and `/api/workspace/file` before Next**. Treat `server.mjs` as the source of truth for those endpoints; keep Next routes in sync if you rely on `next dev` without the custom server (they can drift otherwise).
 
-Environment: **`OPENMD_WORKSPACE`** is used by some Next route code to resolve paths; the custom server uses the `--workspace` CLI argument (default `process.cwd()`) as `workspaceRoot`. When changing filesystem behavior, verify both paths.
+Environment: **`FOLIAGE_WORKSPACE`** is used by some Next route code to resolve paths; the custom server uses the `--workspace` CLI argument (default `process.cwd()`) as `workspaceRoot`. When changing filesystem behavior, verify both paths.
 
 ## Commands
 
@@ -39,14 +39,14 @@ From `apps/web`:
 
 **Note:** Do not start a long-running dev server in agent automation unless the user explicitly asks.
 
-End users can also run `pnpx openmd` / `pnpx openmd --workspace /path` (see root `README.md`).
+End users can also run `pnpx foliage` / `pnpx foliage --workspace /path` (see root `README.md`).
 
 ## Application architecture (web app)
 
 ### Shell layout
 
 - `apps/web/app/page.tsx` – `h-screen` column: menubar, **`flex-1 min-h-0`** main row (sidebar + editor), statusbar. The main row **must** use `flex-1 min-h-0` (not only `h-full`) so nested `flex-1` editors get a real height.
-- `components/sidebar/sidebar.tsx` – Workspace tree, CRUD/move via `fetch` to `/api/workspace`. Drag-and-drop uses custom MIME types from `lib/openmd-dnd.ts` and highlight logic from `lib/workspace-tree-dnd.ts`.
+- `components/sidebar/sidebar.tsx` – Workspace tree, CRUD/move via `fetch` to `/api/workspace`. Drag-and-drop uses custom MIME types from `lib/foliage-dnd.ts` and highlight logic from `lib/workspace-tree-dnd.ts`.
 - `components/editor/editor-layout-root.tsx` – `react-resizable-panels` `Group`/`Panel`/`Separator`. Nested splits mirror `lib/editor-layout.ts`. **Separators:** horizontal splits use a vertical grip (`w-1`); vertical (stacked) splits use a horizontal grip (`h-1 w-full`) so the hit area has non-zero size on the flex main axis.
 - `stores/files.store.ts` – Zustand: `layoutRoot`, `groups` (tabs per pane), `openFile`, `openFileInGroup`, `moveFileToSplit`, `applyPathMove`, workspace revision, drag UX (`treeDragSource*`, `workspaceDropHighlight`, `clearTreeDragUi`).
 - `lib/editor-layout.ts` – Pure tree of leaves and splits; `splitLeaf`, `removeLeafGroupNode`, `mergeSide` (`left`/`right` → horizontal group; `top`/`bottom` → vertical group).
@@ -64,7 +64,7 @@ End users can also run `pnpx openmd` / `pnpx openmd --workspace /path` (see root
 
 ### Drag and drop conventions
 
-- `OPENMD_PATH_MIME`, `OPENMD_SOURCE_GROUP_MIME`, `OPENMD_IS_DIR_MIME` in `lib/openmd-dnd.ts`. Use **`OPENMD_IS_DIR_MIME`** so dropping a **folder** does not open it as a file.
+- `FOLIAGE_PATH_MIME`, `FOLIAGE_SOURCE_GROUP_MIME`, `FOLIAGE_IS_DIR_MIME` in `lib/foliage-dnd.ts`. Use **`FOLIAGE_IS_DIR_MIME`** so dropping a **folder** does not open it as a file.
 - Tree moves use **PATCH** `/api/workspace` with `{ path, toDirectory }`. **Do not use PUT** for these APIs unless the user explicitly requires it.
 - Global cleanup: `editor-layout-root.tsx` listens for `dragend` (capture) to reset file/tree drag UI.
 
@@ -92,7 +92,7 @@ Align with existing files and team conventions:
 - **Editor height collapsed to a few pixels:** Check `page.tsx` main row has `flex-1 min-h-0`; check `EditorLayoutRoot` / panels use `flex-1` and `min-h-0` through the chain.
 - **Vertical split resize dead:** Separator likely has only `w-1` inside a vertical `Group`; use `h-1 w-full` for that orientation.
 - **Tree move to root fails:** Root list area and **file** rows must participate in drop targeting (parent directory of the file is often `''` for root-level files). See `lib/workspace-tree-dnd.ts` and sidebar handlers.
-- **Workspace path wrong in API:** Confirm whether the request hit `server.mjs` or a Next route; align `OPENMD_WORKSPACE` / `--workspace` behavior.
+- **Workspace path wrong in API:** Confirm whether the request hit `server.mjs` or a Next route; align `FOLIAGE_WORKSPACE` / `--workspace` behavior.
 
 ## Related docs
 

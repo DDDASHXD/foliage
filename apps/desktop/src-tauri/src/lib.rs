@@ -154,7 +154,7 @@ pub fn run() {
             if cfg!(debug_assertions) && server::is_healthy(server::DEV_SERVER_PORT) {
                 let _ = server::adopt_running_server(server::DEV_SERVER_PORT, &shell);
             } else if let Err(start_error) = server::start_server(&shell) {
-                eprintln!("openmd-server failed to start: {start_error}");
+                eprintln!("foliage-server failed to start: {start_error}");
             }
 
             if cfg!(debug_assertions) {

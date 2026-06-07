@@ -1,7 +1,6 @@
 import { useSettingsStore } from '@/stores/settings.store'
 import { useFilesStore } from '@/stores/files.store'
 import { useFileContentStore } from '@/stores/file-content.store'
-import { exportMarkdownFiles } from '@/lib/export-markdown'
 import { useLeafmarkStore } from '@/stores/leafmark.store'
 
 export type CommandCategory = 'General' | 'File' | 'Edit' | 'View' | 'Window' | 'Settings' | 'Help'
@@ -172,7 +171,7 @@ export function createDefaultCommands(): Command[] {
       category: 'Settings',
       execute: async () => {
         const { openFile } = useFilesStore.getState()
-        openFile('.openmd/settings.json')
+        openFile('.foliage/settings.json')
       },
     },
     {
@@ -188,20 +187,11 @@ export function createDefaultCommands(): Command[] {
     },
     {
       id: 'file.leafmark',
-      title: 'Leafmark',
-      description: 'Open Leafmark project settings and build tools',
+      title: 'Export',
+      description: 'Open export settings and build tools',
       category: 'File',
       execute: async () => {
         await useLeafmarkStore.getState().openDialog()
-      },
-    },
-    {
-      id: 'file.export',
-      title: 'Export',
-      description: 'Export markdown to PDF with Leafmark',
-      category: 'File',
-      execute: async () => {
-        await exportMarkdownFiles()
       },
     },
     {
@@ -301,13 +291,13 @@ export function createDefaultCommands(): Command[] {
     },
     {
       id: 'help.about',
-      title: 'About OpenMD',
-      description: 'View information about OpenMD',
+      title: 'About Foliage',
+      description: 'View information about Foliage',
       category: 'Help',
       children: [
         {
           id: 'help.about.name',
-          title: 'OpenMD',
+          title: 'Foliage',
           description: 'A local-first markdown/code workspace UI',
           category: 'Help',
         },
@@ -324,7 +314,7 @@ export function createDefaultCommands(): Command[] {
         {
           id: 'help.about.website',
           title: 'Website',
-          description: 'github.com/DDDASHXD/openmd',
+          description: 'github.com/DDDASHXD/foliage',
           category: 'Help',
         },
         {

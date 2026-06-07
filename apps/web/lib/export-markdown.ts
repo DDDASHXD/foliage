@@ -21,10 +21,10 @@ export const exportMarkdownFiles = async (
 
   useFilesStore.getState().bumpWorkspace()
 
-  if (result.outputs.pdf) {
-    useFilesStore.getState().openFile(result.outputs.pdf)
-  } else if (result.outputs.html) {
-    useFilesStore.getState().openFile(result.outputs.html)
+  const primaryOutput = result.outputs.pdf ?? result.outputs.docx ?? result.outputs.html ?? null
+
+  if (primaryOutput) {
+    useFilesStore.getState().openFile(primaryOutput)
   }
 
   return {

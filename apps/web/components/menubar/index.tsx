@@ -38,9 +38,9 @@ const Menubar = () => {
   return (
     <MenubarRoot className="bg-secondary border-0">
       <MenubarMenu>
-        <MenubarTrigger className="font-bold">Openmd</MenubarTrigger>
+        <MenubarTrigger className="font-bold">Foliage</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => void runAction('about')}>About Openmd</MenubarItem>
+          <MenubarItem onClick={() => void runAction('about')}>About Foliage</MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={() => void runAction('report_bug')}>Report a bug</MenubarItem>
         </MenubarContent>
@@ -55,8 +55,7 @@ const Menubar = () => {
           </MenubarGroup>
           <MenubarSeparator />
           <MenubarGroup>
-            <MenubarItem onClick={() => void runAction('leafmark')}>Leafmark…</MenubarItem>
-            <MenubarItem onClick={() => void runAction('export')}>Export</MenubarItem>
+            <MenubarItem onClick={() => void runAction('leafmark')}>Export…</MenubarItem>
             <MenubarItem onClick={() => void runAction('live_share')}>Start live share…</MenubarItem>
           </MenubarGroup>
         </MenubarContent>

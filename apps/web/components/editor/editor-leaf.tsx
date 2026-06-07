@@ -3,7 +3,7 @@
 import EditorTabs from '@/components/editor/tabs'
 import { EditorPane } from '@/components/editor/editor-pane'
 import type { EditorSide } from '@/lib/editor-layout'
-import { OPENMD_PATH_MIME, OPENMD_SOURCE_GROUP_MIME } from '@/lib/openmd-dnd'
+import { getFoliagePath, getFoliageSourceGroup, isTreeDirectoryDrag } from '@/lib/foliage-dnd'
 import { useFilesStore } from '@/stores/files.store'
 import { cn } from '@workspace/ui/lib/utils'
 import React from 'react'
@@ -31,12 +31,15 @@ export const EditorLeaf = ({ groupId }: EditorLeafProps) => {
     event.stopPropagation()
     setEdgeHover(null)
     try {
-      const path = event.dataTransfer.getData(OPENMD_PATH_MIME)
+      if (isTreeDirectoryDrag(event.dataTransfer)) {
+        return
+      }
+
+      const path = getFoliagePath(event.dataTransfer)
       if (!path) {
         return
       }
-      const sourceRaw = event.dataTransfer.getData(OPENMD_SOURCE_GROUP_MIME)
-      const sourceGroupId = sourceRaw.length > 0 ? sourceRaw : null
+      const sourceGroupId = getFoliageSourceGroup(event.dataTransfer)
       moveFileToSplit({
         path,
         sourceGroupId,

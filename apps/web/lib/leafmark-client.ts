@@ -1,6 +1,10 @@
 import { backendFetch, getBackendBaseUrl } from '@/lib/backend-client'
 
+export type LeafmarkOutputFormat = 'pdf' | 'docx'
+
 export type LeafmarkBuildOptions = {
+  output?: string
+  outputFormat?: LeafmarkOutputFormat
   html?: boolean
   htmlOnly?: boolean
   noMergeCover?: boolean
@@ -45,6 +49,7 @@ export type LeafmarkBuildResult = {
   projectBase: string
   outputs: {
     pdf?: string
+    docx?: string
     html?: string
   }
 }

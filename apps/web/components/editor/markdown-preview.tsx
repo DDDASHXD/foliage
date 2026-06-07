@@ -14,7 +14,7 @@ export const MarkdownPreview = ({ path }: MarkdownPreviewProps) => {
   React.useEffect(() => {
     const renderMarkdown = async () => {
       const { marked } = await import('marked')
-      const html = await marked.parse(content, { gfm: true, breaks: true })
+      const html = await marked.parse(content, { gfm: true, breaks: false })
       setRenderedHtml(html)
     }
     renderMarkdown()
@@ -28,12 +28,12 @@ export const MarkdownPreview = ({ path }: MarkdownPreviewProps) => {
         style={{
           lineHeight: '1.6',
         }}
-        className="[&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:mb-4 [&_h1]:mt-2
-                   [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:mb-3 [&_h2]:mt-8
-                   [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:tracking-tight [&_h3]:mb-3 [&_h3]:mt-6
-                   [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:tracking-tight [&_h4]:mb-2 [&_h4]:mt-4
-                   [&_h5]:text-base [&_h5]:font-semibold [&_h5]:tracking-tight [&_h5]:mb-2 [&_h5]:mt-4
-                   [&_h6]:text-sm [&_h6]:font-semibold [&_h6]:tracking-tight [&_h6]:mb-2 [&_h6]:mt-4 [&_h6]:text-muted-foreground
+        className="[&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:mb-4 [&_h1]:mt-2
+                   [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-8
+                   [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mb-3 [&_h3]:mt-6
+                   [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:mb-2 [&_h4]:mt-4
+                   [&_h5]:text-base [&_h5]:font-semibold [&_h5]:mb-2 [&_h5]:mt-4
+                   [&_h6]:text-sm [&_h6]:font-semibold [&_h6]:mb-2 [&_h6]:mt-4 [&_h6]:text-muted-foreground
 
                    [&_p]:my-4 [&_p]:leading-relaxed
 

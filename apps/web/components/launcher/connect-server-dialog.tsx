@@ -46,7 +46,7 @@ export const ConnectServerDialog = ({
       const healthy = await checkServerHealth(normalized)
 
       if (!healthy) {
-        throw new Error('Server is unreachable or not an openmd server.')
+        throw new Error('Server is unreachable or not a foliage server.')
       }
 
       const displayLabel = label.trim() || new URL(normalized).host
@@ -67,7 +67,7 @@ export const ConnectServerDialog = ({
         <DialogHeader>
           <DialogTitle>Connect to server</DialogTitle>
           <DialogDescription>
-            Enter the URL of a running openmd-server instance.
+            Enter the URL of a running foliage-server instance.
           </DialogDescription>
         </DialogHeader>
 

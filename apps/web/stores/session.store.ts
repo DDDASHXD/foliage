@@ -32,7 +32,7 @@ type SessionStore = {
   startRemoteSession: (serverUrl: string, label: string, kind: 'server' | 'live-share') => void
 }
 
-const defaultRelayUrl = 'https://openmd.skxv.dev'
+const defaultRelayUrl = 'https://foliage.skxv.dev'
 
 const createRecentId = (project: Omit<RecentProject, 'lastOpenedAt' | 'id'>) => {
   if (project.kind === 'local' && project.workspacePath) {
@@ -125,7 +125,7 @@ export const useSessionStore = create<SessionStore>()(
       },
     }),
     {
-      name: 'openmd-session',
+      name: 'foliage-session',
       partialize: (state) => ({
         mode: state.mode,
         workspacePath: state.workspacePath,
