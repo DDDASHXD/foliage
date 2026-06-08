@@ -1,3 +1,4 @@
+import { normalizeServerUrl } from '@/lib/server-url'
 import { useSessionStore } from '@/stores/session.store'
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, '')
@@ -59,7 +60,10 @@ export const getWorkspaceFileUrl = (relativePath: string): string => {
 
 export const checkServerHealth = async (serverUrl: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${normalizeBaseUrl(serverUrl)}/api/health`)
+    const { url } = normalizeServerUrl(serverUrl)
+    const response = await fetch(`${url}/api/health`, {
+      signal: AbortSignal.timeout(5000),
+    })
 
     if (!response.ok) {
       return false

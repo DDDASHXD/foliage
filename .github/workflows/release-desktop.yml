@@ -112,8 +112,6 @@ jobs:
             ```bash
             xattr -cr /Applications/foliage.app
             ```
-
-            Or right-click the app and choose **Open** (first launch only).
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

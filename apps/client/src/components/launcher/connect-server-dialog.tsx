@@ -1,6 +1,6 @@
-
 import React from 'react'
 import { checkServerHealth } from '@/lib/backend-client'
+import { normalizeServerUrl } from '@/lib/server-url'
 import { Button } from '@workspace/ui/components/button'
 import {
   Dialog,
@@ -27,25 +27,27 @@ export const ConnectServerDialog = ({
   const [serverUrl, setServerUrl] = React.useState('')
   const [label, setLabel] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
+  const [hint, setHint] = React.useState<string | null>(null)
   const [connecting, setConnecting] = React.useState(false)
 
   const handleConnect = async () => {
-    const trimmedUrl = serverUrl.trim()
-
-    if (!trimmedUrl) {
-      setError('Server URL is required.')
-      return
-    }
-
     setConnecting(true)
     setError(null)
+    setHint(null)
 
     try {
-      const normalized = trimmedUrl.replace(/\/+$/, '')
-      const healthy = await checkServerHealth(normalized)
+      const { url: normalized, hint: normalizedHint } = normalizeServerUrl(serverUrl)
+
+      if (normalizedHint) {
+        setHint(normalizedHint)
+      }
+
+      const healthy = await checkServerHealth(serverUrl)
 
       if (!healthy) {
-        throw new Error('Server is unreachable or not a foliage server.')
+        throw new Error(
+          'Server is unreachable or not a foliage server. On this computer use 127.0.0.1:8787. From another device use <server-ip>:8787 (not 127.0.0.1 or 0.0.0.0).',
+        )
       }
 
       const displayLabel = label.trim() || new URL(normalized).host
@@ -66,16 +68,18 @@ export const ConnectServerDialog = ({
         <DialogHeader>
           <DialogTitle>Connect to server</DialogTitle>
           <DialogDescription>
-            Enter the URL of a running foliage-server instance.
+            Enter the address of a running foliage-server. HTTP is assumed unless you
+            prefix https://. On this computer use 127.0.0.1:8787. From another device
+            use &lt;server-ip&gt;:8787.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="server-url">Server URL</Label>
+            <Label htmlFor="server-url">Server address</Label>
             <Input
               id="server-url"
-              placeholder="https://notes.example.com:8787"
+              placeholder="127.0.0.1:8787"
               value={serverUrl}
               onChange={(event) => setServerUrl(event.target.value)}
             />
@@ -91,6 +95,7 @@ export const ConnectServerDialog = ({
             />
           </div>
 
+          {hint && <p className="text-muted-foreground text-sm">{hint}</p>}
           {error && <p className="text-destructive text-sm">{error}</p>}
         </div>
 
