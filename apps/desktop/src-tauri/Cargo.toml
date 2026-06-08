@@ -1,6 +1,6 @@
 [package]
 name = "foliage-desktop"
-version = "0.1.1"
+version = "0.1.2"
 description = "Foliage desktop application"
 authors = ["foliage"]
 edition = "2021"
