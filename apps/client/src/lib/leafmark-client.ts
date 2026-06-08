@@ -1,4 +1,4 @@
-import { backendFetch, getBackendBaseUrl } from '@/lib/backend-client'
+import { backendFetch } from '@/lib/backend-client'
 
 export type LeafmarkOutputFormat = 'pdf' | 'docx'
 
@@ -60,15 +60,18 @@ const parseJson = async <T>(response: Response): Promise<T & { error?: string }>
 const leafmarkFetch = async <T>(
   init: RequestInit & { action?: string; query?: Record<string, string> },
 ): Promise<T> => {
-  const url = new URL('/api/workspace/leafmark', getBackendBaseUrl())
+  const searchParams = new URLSearchParams()
 
   if (init.query) {
     for (const [key, value] of Object.entries(init.query)) {
-      url.searchParams.set(key, value)
+      searchParams.set(key, value)
     }
   }
 
-  const response = await backendFetch(url.pathname + url.search, init)
+  const query = searchParams.toString()
+  const path = query ? `/api/workspace/leafmark?${query}` : '/api/workspace/leafmark'
+
+  const response = await backendFetch(path, init)
   const data = await parseJson<T>(response)
 
   if (!response.ok) {

@@ -18,18 +18,21 @@ export const DesktopBootstrap = () => {
     void (async () => {
       const onLauncherRoute = location.pathname.startsWith('/launcher')
 
-      if (onLauncherRoute) {
-        useSessionStore.getState().clearSession()
-      }
-
       const serverUrl = await getLocalServerUrl()
 
-      if (!serverUrl) {
-        if (!onLauncherRoute) {
-          useSessionStore.getState().clearSession()
-          navigate('/launcher', { replace: true })
+      if (onLauncherRoute) {
+        useSessionStore.getState().clearSession()
+
+        if (serverUrl) {
+          useSessionStore.getState().setServerUrl(serverUrl)
         }
 
+        return
+      }
+
+      if (!serverUrl) {
+        useSessionStore.getState().clearSession()
+        navigate('/launcher', { replace: true })
         return
       }
 

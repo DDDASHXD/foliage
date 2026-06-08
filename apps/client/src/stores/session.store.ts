@@ -96,7 +96,6 @@ export const useSessionStore = create<SessionStore>()(
         set({
           mode: 'local',
           workspacePath,
-          serverUrl: null,
           shareUrl: null,
         })
 

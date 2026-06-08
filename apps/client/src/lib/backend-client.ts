@@ -2,6 +2,14 @@ import { useSessionStore } from '@/stores/session.store'
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, '')
 
+const isTauriRuntime = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return '__TAURI_INTERNALS__' in window || '__TAURI__' in window
+}
+
 export const getBackendBaseUrl = (): string => {
   if (typeof window === 'undefined') {
     return ''
@@ -13,15 +21,26 @@ export const getBackendBaseUrl = (): string => {
     return normalizeBaseUrl(override)
   }
 
+  // Production Tauri serves the UI from asset:// — not a valid HTTP base for fetch/URL.
+  if (isTauriRuntime()) {
+    throw new Error('Local server URL is not ready yet.')
+  }
+
   return window.location.origin
 }
 
 export const getBackendWebSocketBase = (): string => {
   const baseUrl = getBackendBaseUrl()
-  const parsed = new URL(baseUrl)
-  const protocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:'
 
-  return `${protocol}//${parsed.host}`
+  if (baseUrl.startsWith('https://')) {
+    return `wss://${baseUrl.slice('https://'.length).split('/')[0]}`
+  }
+
+  if (baseUrl.startsWith('http://')) {
+    return `ws://${baseUrl.slice('http://'.length).split('/')[0]}`
+  }
+
+  throw new Error(`Unsupported backend base URL: ${baseUrl}`)
 }
 
 export const getCollaborationWsUrl = (): string => {

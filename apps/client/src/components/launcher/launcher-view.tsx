@@ -53,14 +53,13 @@ export const LauncherView = () => {
           console.log('[foliage] opening project:', workspacePath)
         }
 
-        startLocalSession(workspacePath, label)
-
         const server = await startLocalServer(workspacePath)
 
         if (import.meta.env.DEV) {
           console.log('[foliage] local server ready:', server)
         }
 
+        startLocalSession(workspacePath, label)
         await enterEditor()
       } catch (openError) {
         console.error('[foliage] failed to open project:', openError)

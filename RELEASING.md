@@ -8,15 +8,15 @@ The release version lives in the root [`VERSION`](./VERSION) file.
 
 `pnpm version:sync` copies that value into every release artifact:
 
-| File | Purpose |
-|------|---------|
-| `package.json` | Root npm package |
-| `apps/client/package.json` | Vite client |
-| `apps/desktop/package.json` | Desktop workspace |
-| `packages/foliage-server/package.json` | Headless server |
-| `packages/foliage-relay/package.json` | Relay server |
+| File                                     | Purpose              |
+| ---------------------------------------- | -------------------- |
+| `package.json`                           | Root npm package     |
+| `apps/client/package.json`               | Vite client          |
+| `apps/desktop/package.json`              | Desktop workspace    |
+| `packages/foliage-server/package.json`   | Headless server      |
+| `packages/foliage-relay/package.json`    | Relay server         |
 | `apps/desktop/src-tauri/tauri.conf.json` | Tauri bundle version |
-| `apps/desktop/src-tauri/Cargo.toml` | Rust crate version |
+| `apps/desktop/src-tauri/Cargo.toml`      | Rust crate version   |
 
 The client UI reads the same value at build time through `VITE_FOLIAGE_VERSION`.
 
