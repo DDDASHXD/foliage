@@ -35,19 +35,27 @@ export const startServer = async (options = {}) => {
     options.port ??
     (requestedPort ? Number.parseInt(requestedPort, 10) : undefined) ??
     Number.parseInt(process.env.PORT ?? '3000', 10)
-  const headless = options.headless ?? hasFlag(argv, '--headless')
+  const requestedAppDir = getArgumentValue(argv, '--app-dir')
+  const appDirectory = options.appDirectory ?? requestedAppDir
+
+  let headless = options.headless
+
+  if (headless === undefined && hasFlag(argv, '--headless')) {
+    headless = true
+  }
+
+  if (headless === undefined) {
+    headless = !appDirectory
+  }
+
   const serveNext = options.serveNext ?? !headless
 
   const requestedWorkspace = getArgumentValue(argv, '--workspace')
   let workspaceRoot = path.resolve(options.workspaceRoot ?? requestedWorkspace ?? process.cwd())
   let workspaceName = path.basename(workspaceRoot) || workspaceRoot
 
-  const requestedAppDir = getArgumentValue(argv, '--app-dir')
-  const appDirectory =
-    options.appDirectory ?? requestedAppDir ?? (serveNext ? undefined : packageRoot)
-
   if (!appDirectory && serveNext) {
-    throw new Error('appDirectory is required when serving Next.js UI.')
+    throw new Error('appDirectory is required when serving Next.js UI. Use --headless or pass --app-dir.')
   }
 
   process.env.FOLIAGE_WORKSPACE = workspaceRoot

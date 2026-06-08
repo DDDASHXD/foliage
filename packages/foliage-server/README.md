@@ -1,4 +1,4 @@
-# @foliage/server
+# foliage-server
 
 Authoritative Foliage workspace runtime: filesystem API, Yjs collaboration, and optional Next.js UI hosting.
 

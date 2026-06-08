@@ -132,12 +132,13 @@ Desktop build output is written under `apps/desktop/src-tauri/target/release/bun
 Foliage can run without serving the full UI. This is useful for a LAN or VPS workspace that desktop or web clients connect to.
 
 ```bash
-foliage-server \
-  --headless \
+pnpx foliage-server \
   --workspace /path/to/project \
   --port 8787 \
   --hostname 0.0.0.0
 ```
+
+`--headless` is optional when `--app-dir` is omitted. For full UI mode, pass `--app-dir` to a built or dev Next.js app directory.
 
 Check that it is running:
 
@@ -177,7 +178,7 @@ See `packages/foliage-relay/README.md` for relay details.
 Desktop app or browser UI
         |
         v
-@foliage/server
+foliage-server
   - workspace filesystem API
   - Yjs collaboration WebSocket
   - Leafmark build API
@@ -193,7 +194,7 @@ Desktop app or browser UI
 | --------------------------- | --------------------------------------------------- |
 | `pnpx foliage`              | Local Foliage server plus web UI                    |
 | Desktop app                 | Tauri shell plus embedded Foliage server            |
-| `foliage-server --headless` | Workspace API, collaboration, and Leafmark API only |
+| `pnpx foliage-server`       | Workspace API, collaboration, and Leafmark API only |
 | `foliage-relay`             | Public relay for live share                         |
 
 ## Repository Layout

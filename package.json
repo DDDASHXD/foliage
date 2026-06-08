@@ -9,7 +9,7 @@
     "foliage-relay-client": "./packages/foliage-relay/bin/foliage-relay-client.mjs"
   },
   "dependencies": {
-    "@foliage/server": "workspace:*",
+    "foliage-server": "workspace:*",
     "@foliage/relay": "workspace:*"
   },
   "scripts": {

@@ -192,7 +192,7 @@ await fs.mkdir(resourcesDirectory, { recursive: true })
 const deployTarget = path.join('apps', 'desktop', 'src-tauri', 'resources', 'foliage-server')
 
 runCommand(
-  `${pnpmCommand()} --filter @foliage/server deploy --config.node-linker=hoisted ${deployTarget}`,
+  `${pnpmCommand()} --filter foliage-server deploy --config.node-linker=hoisted ${deployTarget}`,
   { cwd: repoRoot },
 )
 

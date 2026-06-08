@@ -22,10 +22,9 @@ export const parseServerArgs = (argv = process.argv) => {
   const requestedPort = getArgumentValue(argv, '--port')
   const requestedHostname = getArgumentValue(argv, '--hostname')
   const requestedAppDir = getArgumentValue(argv, '--app-dir')
-  const headless = hasFlag(argv, '--headless')
+  const headless = hasFlag(argv, '--headless') || !requestedAppDir
 
   return {
-    workspaceRoot: requestedWorkspace ? undefined : undefined,
     workspaceArg: requestedWorkspace,
     port: requestedPort ? Number.parseInt(requestedPort, 10) : undefined,
     hostname: requestedHostname,

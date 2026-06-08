@@ -4,7 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { startServer } from '@foliage/server'
+import { startServer } from 'foliage-server'
 
 const DEV_PORT = 3000
 const DEV_HOST = '127.0.0.1'

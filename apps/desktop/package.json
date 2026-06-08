@@ -11,7 +11,7 @@
     "typecheck": "echo 'no types'"
   },
   "dependencies": {
-    "@foliage/server": "workspace:*"
+    "foliage-server": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.2.7"

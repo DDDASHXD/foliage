@@ -1,11 +1,22 @@
 {
-  "name": "@foliage/server",
+  "name": "foliage-server",
   "version": "0.0.1",
+  "description": "Foliage workspace server: filesystem API, collaboration, and Leafmark builds",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DDDASHXD/foliage.git",
+    "directory": "packages/foliage-server"
+  },
   "bin": {
     "foliage-server": "./bin/foliage-server.mjs"
   },
+  "files": [
+    "bin",
+    "lib",
+    "src"
+  ],
   "exports": {
     ".": "./src/create-server.mjs",
     "./project-template": "./src/lib/project-template.mjs"
@@ -20,5 +31,8 @@
     "next": "16.1.6",
     "ws": "^8.20.0",
     "y-websocket": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
